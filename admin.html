@@ -8,46 +8,50 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #5856D6; --success: #34C759; --danger: #FF3B30; --bg: #F2F2F7; --black: #1C1C1E; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--black); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #5856D6; --success: #34C759; --danger: #FF3B30; --bg: #F2F2F7; --black: #1C1C1E; --card-bg: white; --text: #1C1C1E; --border: #E5E5EA; }
+        body.dark { --bg: #000000; --card-bg: #1C1C1E; --text: #FFFFFF; --border: #2C2C2E; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); transition: all 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 100; }
         .admin-nav { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .nav-link { background: white; padding: 10px 18px; border-radius: 15px; font-size: 13px; font-weight: 700; text-decoration: none; color: black; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .nav-link { background: var(--card-bg); padding: 12px 18px; border-radius: 15px; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--text); white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
         .nav-link:active { background: var(--primary); color: white; }
-        .card { background: white; border-radius: 22px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); }
+        .card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         h2 { font-size: 17px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
-        h2 i { color: var(--primary); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        input { width: 100%; padding: 14px; border: 1.5px solid #E5E5EA; border-radius: 14px; font-size: 16px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--primary); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+        input, textarea { width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 16px; outline: none; background: var(--card-bg); color: var(--text); margin-bottom: 10px; }
+        input:focus, textarea:focus { border-color: var(--primary); }
         button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 15px; }
         .btn-save { background: var(--primary); color: white; }
         .btn-bank { background: var(--black); color: white; margin-top: 10px; }
-        button:active { transform: scale(0.98); }
         .list-container { max-height: 350px; overflow-y: auto; padding-right: 5px; }
-        .item-card { background: #F8F8FA; padding: 15px; border-radius: 18px; margin-bottom: 10px; position: relative; border: 1px solid #EEE; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .item-card { background: var(--bg); padding: 15px; border-radius: 18px; margin-bottom: 10px; position: relative; border: 1px solid var(--border); }
         .item-meta { font-size: 11px; color: #8E8E93; margin-bottom: 5px; display: flex; justify-content: space-between; }
-        .item-title { font-weight: 800; font-size: 15px; color: var(--black); }
-        .delete-icon { position: absolute; right: 15px; top: 15px; color: #D1D1D6; font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .item-title { font-weight: 800; font-size: 15px; }
+        .delete-icon { position: absolute; right: 15px; top: 15px; color: #D1D1D6; font-size: 18px; cursor: pointer; }
         .delete-icon:hover { color: var(--danger); }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: white; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid rgba(0,0,0,0.02); }
+        .stat-box { background: var(--card-bg); padding: 15px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
         .stat-num { font-size: 20px; font-weight: 900; color: var(--primary); }
-        .stat-label { font-size: 12px; color: var(--grey); font-weight: 600; }
-        .review-type { font-size: 12px; padding: 4px 8px; border-radius: 8px; margin-bottom: 5px; display: inline-block; }
+        .review-type { font-size: 12px; padding: 4px 8px; border-radius: 8px; display: inline-block; }
         .type-pos { background: #E8F5E9; color: #2E7D32; }
         .type-neg { background: #FFEBEE; color: #C62828; }
-        .lang-btns { display: flex; gap: 5px; margin-bottom: 10px; }
-        .lang-btns button { padding: 5px 10px; font-size: 10px; width: auto; border-radius: 8px; background: #ddd; }
+        .lang-btns { display: flex; gap: 5px; }
+        .lang-btns button { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 10px; background: #ddd; }
         .lang-btns button.active { background: var(--primary); color: white; }
+        .dark-mode-toggle { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 30px; cursor: pointer; font-size: 18px; }
+        .users-list { max-height: 400px; overflow-y: auto; }
+        .user-card { background: var(--bg); padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .user-info { flex: 1; }
+        .user-code-badge { background: var(--primary); color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; font-family: monospace; }
+        .delete-user { color: var(--danger); cursor: pointer; padding: 5px 10px; }
     </style>
 </head>
 <body>
-
     <div class="header">
-        <h1 id="adm-title" style="font-size: 22px; font-weight: 800;">Админ панель</h1>
+        <h1 id="adm-title" style="font-size: 22px; font-weight: 800; margin:0;">Админ панель</h1>
         <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" id="dark-mode-toggle">🌙</button>
             <div class="lang-btns">
                 <button id="adm-ky" class="active" onclick="switchAdminLang('ky')">KY</button>
                 <button id="adm-ru" onclick="switchAdminLang('ru')">RU</button>
@@ -57,10 +61,12 @@
     </div>
 
     <div class="admin-nav">
-        <a href="#section-rates" class="nav-link" id="nav-rates">Курстар</a>
-        <a href="#section-bank" class="nav-link" id="nav-bank">Реквизиттер</a>
-        <a href="#section-orders" class="nav-link" id="nav-orders">Заказдар</a>
-        <a href="#section-reviews" class="nav-link" id="nav-reviews">Отзывтар</a>
+        <a class="nav-link" onclick="showSection('section-rates')" id="nav-rates">Курстар</a>
+        <a class="nav-link" onclick="showSection('section-bank')" id="nav-bank">Реквизиттер</a>
+        <a class="nav-link" onclick="showSection('section-orders')" id="nav-orders">Заказдар</a>
+        <a class="nav-link" onclick="showSection('section-reviews')" id="nav-reviews">Отзывтар</a>
+        <a class="nav-link" onclick="showSection('section-services')" id="nav-services">Услугалар</a>
+        <a class="nav-link" onclick="showSection('section-users')" id="nav-users">Колдонуучулар</a>
     </div>
 
     <div class="stat-grid">
@@ -68,53 +74,68 @@
         <div class="stat-box"><div class="stat-num" id="stat-reviews">0</div><div class="stat-label" id="lbl-stat-reviews">Отзывтар</div></div>
     </div>
 
-    <div class="card" id="section-rates">
+    <div id="section-rates" class="card">
         <h2 id="h2-rates"><i class="fas fa-chart-line"></i> Юань курстары</h2>
-        <label style="font-size: 12px; color: gray; margin-bottom: 5px; display: block;">Alipay (T1, T2, T3)</label>
+        <label style="font-size: 12px; color: gray;">Alipay (T1, T2, T3)</label>
         <div class="grid">
-            <input type="number" id="ali-t1" step="0.01" placeholder="T1">
-            <input type="number" id="ali-t2" step="0.01" placeholder="T2">
-            <input type="number" id="ali-t3" step="0.01" placeholder="T3">
+            <input type="number" id="ali-t1" step="0.01" placeholder="T1 (<2000с)">
+            <input type="number" id="ali-t2" step="0.01" placeholder="T2 (<15000с)">
+            <input type="number" id="ali-t3" step="0.01" placeholder="T3 (>15000с)">
         </div>
-        <label style="font-size: 12px; color: gray; margin-bottom: 5px; display: block;">WeChat (T1, T2, T3)</label>
+        <label style="font-size: 12px; color: gray;">WeChat (T1, T2, T3)</label>
         <div class="grid">
-            <input type="number" id="we-t1" step="0.01" placeholder="T1">
-            <input type="number" id="we-t2" step="0.01" placeholder="T2">
-            <input type="number" id="we-t3" step="0.01" placeholder="T3">
+            <input type="number" id="we-t1" step="0.01" placeholder="T1 (<2000с)">
+            <input type="number" id="we-t2" step="0.01" placeholder="T2 (<15000с)">
+            <input type="number" id="we-t3" step="0.01" placeholder="T3 (>15000с)">
         </div>
-        
-        <label id="lbl-promo-rates" style="font-size: 12px; color: #5856D6; font-weight: bold; margin-bottom: 5px; display: block;">Жарнама блогундагы курс (юань менен):</label>
+        <label id="lbl-promo-rates" style="font-size: 12px; color: #5856D6; font-weight: bold;">Жарнама блогундагы курс:</label>
         <div class="grid">
             <input type="number" id="promo-rate-1" step="0.01" placeholder="100ю чейин">
             <input type="number" id="promo-rate-2" step="0.01" placeholder="100-3000ю">
             <input type="number" id="promo-rate-3" step="0.01" placeholder="3000ю жогору">
         </div>
-
-        <label id="lbl-promo-text" style="font-size: 12px; color: gray; margin-bottom: 5px; display: block;">Жарнама тексти</label>
+        <label id="lbl-promo-text">Жарнама тексти</label>
         <input type="text" id="promo-text" placeholder="...">
+        <label>Telegram канал шилтемеси</label>
+        <input type="text" id="channel-link" placeholder="https://t.me/...">
         <button id="btn-update-rates" class="btn-save" onclick="updateRates()" style="margin-top: 15px;">КУРСТАРДЫ ЖАҢЫРТУУ</button>
     </div>
 
-    <div class="card" id="section-bank">
+    <div id="section-bank" class="card" style="display:none;">
         <h2 id="h2-bank"><i class="fas fa-university"></i> Реквизиттер</h2>
         <input type="text" id="bank-name" placeholder="Банк">
-        <input type="text" id="bank-num" placeholder="Номер" style="margin-top:10px;">
-        <input type="text" id="bank-owner" placeholder="Ээси" style="margin-top:10px;">
+        <input type="text" id="bank-num" placeholder="Номер">
+        <input type="text" id="bank-owner" placeholder="Ээси">
+        <label>WhatsApp колдоо номери</label>
+        <input type="text" id="support-wa" placeholder="996990032007">
+        <label>Telegram колдоо логини</label>
+        <input type="text" id="support-tg" placeholder="Temka007z">
         <button id="btn-save-bank" class="btn-bank" onclick="updateBank()">САКТОО</button>
     </div>
 
-    <div class="card" id="section-orders">
+    <div id="section-orders" class="card" style="display:none;">
         <h2 id="h2-orders"><i class="fas fa-shopping-cart"></i> Акыркы заказдар</h2>
-        <div id="orders-list" class="list-container">
-            <p id="txt-loading-orders" style="text-align:center; color:gray; padding: 20px;">Жүктөлүүдө...</p>
+        <div id="orders-list" class="list-container"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
+    </div>
+
+    <div id="section-reviews" class="card" style="display:none;">
+        <h2 id="h2-reviews"><i class="fas fa-comment-dots"></i> Кардарлардын пикирлери</h2>
+        <div id="reviews-list" class="list-container"><p style="text-align:center; color:gray;">Пикирлер жок...</p></div>
+    </div>
+
+    <div id="section-services" class="card" style="display:none;">
+        <h2 id="h2-services"><i class="fas fa-cogs"></i> Услугалар</h2>
+        <div id="services-list" class="list-container"></div>
+        <div style="margin-top: 15px;">
+            <input type="text" id="new-service-name" placeholder="Услуга аты">
+            <input type="text" id="new-service-link" placeholder="Ссылка (URL)">
+            <button class="btn-save" onclick="addService()">➕ КОШУУ</button>
         </div>
     </div>
 
-    <div class="card" id="section-reviews">
-        <h2 id="h2-reviews"><i class="fas fa-comment-dots"></i> Кардарлардын пикирлери</h2>
-        <div id="reviews-list" class="list-container">
-            <p id="txt-no-reviews" style="text-align:center; color:gray; padding: 20px;">Пикирлер жок...</p>
-        </div>
+    <div id="section-users" class="card" style="display:none;">
+        <h2 id="h2-users"><i class="fas fa-users"></i> Колдонуучулар</h2>
+        <div id="users-list" class="users-list"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
     </div>
 
     <script>
@@ -124,18 +145,8 @@
         let currentAdminLang = 'ky';
 
         const adminTranslations = {
-            ky: {
-                title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", 
-                reviews: "Пикирлер", promoLabel: "Жарнама блогундагы курс:", promoTextLabel: "Жарнама тексти",
-                updateBtn: "МААЛЫМАТТЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок",
-                confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!", pos: "😻 Жагымдуу", neg: "😾 Нааразы"
-            },
-            ru: {
-                title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", 
-                reviews: "Отзывы", promoLabel: "Курс в блоке рекламы:", promoTextLabel: "Текст рекламы",
-                updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет",
-                confirm: "Вы уверены, что хотите удалить?", success: "Успешно обновлено!", pos: "😻 Положительный", neg: "😾 Отрицательный"
-            }
+            ky: { title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", reviews: "Пикирлер", services: "Услугалар", users: "Колдонуучулар", promoLabel: "Жарнама блогундагы курс:", promoTextLabel: "Жарнама тексти", updateBtn: "КУРСТАРДЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок", confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!", pos: "😻 Жагымдуу", neg: "😾 Нааразы" },
+            ru: { title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", reviews: "Отзывы", services: "Услуги", users: "Пользователи", promoLabel: "Курс в блоке рекламы:", promoTextLabel: "Текст рекламы", updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет", confirm: "Вы уверены?", success: "Успешно обновлено!", pos: "😻 Положительный", neg: "😾 Отрицательный" }
         };
 
         function switchAdminLang(lang) {
@@ -147,31 +158,46 @@
             document.getElementById('nav-bank').innerText = t.bank;
             document.getElementById('nav-orders').innerText = t.orders;
             document.getElementById('nav-reviews').innerText = t.reviews;
+            document.getElementById('nav-services').innerText = t.services;
+            document.getElementById('nav-users').innerText = t.users;
             document.getElementById('lbl-stat-orders').innerText = t.orders;
             document.getElementById('lbl-stat-reviews').innerText = t.reviews;
             document.getElementById('h2-rates').innerHTML = `<i class="fas fa-chart-line"></i> ${t.rates}`;
             document.getElementById('h2-bank').innerHTML = `<i class="fas fa-university"></i> ${t.bank}`;
             document.getElementById('h2-orders').innerHTML = `<i class="fas fa-shopping-cart"></i> ${t.orders}`;
             document.getElementById('h2-reviews').innerHTML = `<i class="fas fa-comment-dots"></i> ${t.reviews}`;
+            document.getElementById('h2-services').innerHTML = `<i class="fas fa-cogs"></i> ${t.services}`;
+            document.getElementById('h2-users').innerHTML = `<i class="fas fa-users"></i> ${t.users}`;
             document.getElementById('lbl-promo-rates').innerText = t.promoLabel;
             document.getElementById('lbl-promo-text').innerText = t.promoTextLabel;
             document.getElementById('btn-update-rates').innerText = t.updateBtn;
             document.getElementById('btn-save-bank').innerText = t.saveBtn;
-            
             document.getElementById('adm-ky').classList.toggle('active', lang === 'ky');
             document.getElementById('adm-ru').classList.toggle('active', lang === 'ru');
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('dark'); localStorage.setItem('adminDarkMode', document.body.classList.contains('dark')); }
+        if (localStorage.getItem('adminDarkMode') === 'true') document.body.classList.add('dark');
+
+        function showSection(sectionId) {
+            const sections = ['section-rates', 'section-bank', 'section-orders', 'section-reviews', 'section-services', 'section-users'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = id === sectionId ? 'block' : 'none';
+            });
         }
 
         db.ref('exchangeSettings').on('value', (s) => {
             if(s.exists()){
                 const d = s.val();
-                document.getElementById('ali-t1').value = d.ali.t1;
-                document.getElementById('ali-t2').value = d.ali.t2;
-                document.getElementById('ali-t3').value = d.ali.t3;
-                document.getElementById('we-t1').value = d.we.t1;
-                document.getElementById('we-t2').value = d.we.t2;
-                document.getElementById('we-t3').value = d.we.t3;
-                document.getElementById('promo-text').value = d.promo;
+                document.getElementById('ali-t1').value = d.ali?.t1 || '';
+                document.getElementById('ali-t2').value = d.ali?.t2 || '';
+                document.getElementById('ali-t3').value = d.ali?.t3 || '';
+                document.getElementById('we-t1').value = d.we?.t1 || '';
+                document.getElementById('we-t2').value = d.we?.t2 || '';
+                document.getElementById('we-t3').value = d.we?.t3 || '';
+                document.getElementById('promo-text').value = d.promo || '';
+                document.getElementById('channel-link').value = d.channelLink || '';
                 if(d.promoRates) {
                     document.getElementById('promo-rate-1').value = d.promoRates.r1 || "";
                     document.getElementById('promo-rate-2').value = d.promoRates.r2 || "";
@@ -182,6 +208,10 @@
                     document.getElementById('bank-num').value = d.bank.number;
                     document.getElementById('bank-owner').value = d.bank.owner;
                 }
+                if(d.support){
+                    document.getElementById('support-wa').value = d.support.whatsapp || '';
+                    document.getElementById('support-tg').value = d.support.telegram || '';
+                }
             }
         });
 
@@ -190,32 +220,33 @@
                 ali: { t1: parseFloat(document.getElementById('ali-t1').value), t2: parseFloat(document.getElementById('ali-t2').value), t3: parseFloat(document.getElementById('ali-t3').value) },
                 we: { t1: parseFloat(document.getElementById('we-t1').value), t2: parseFloat(document.getElementById('we-t2').value), t3: parseFloat(document.getElementById('we-t3').value) },
                 promo: document.getElementById('promo-text').value,
+                channelLink: document.getElementById('channel-link').value,
                 promoRates: { r1: document.getElementById('promo-rate-1').value, r2: document.getElementById('promo-rate-2').value, r3: document.getElementById('promo-rate-3').value }
             };
             db.ref('exchangeSettings').update(data).then(() => alert(adminTranslations[currentAdminLang].success));
         }
 
         function updateBank() {
-            db.ref('exchangeSettings/bank').set({
-                name: document.getElementById('bank-name').value,
-                number: document.getElementById('bank-num').value,
-                owner: document.getElementById('bank-owner').value
-            }).then(() => alert(adminTranslations[currentAdminLang].success));
+            const updates = {
+                bank: {
+                    name: document.getElementById('bank-name').value,
+                    number: document.getElementById('bank-num').value,
+                    owner: document.getElementById('bank-owner').value
+                },
+                support: {
+                    whatsapp: document.getElementById('support-wa').value,
+                    telegram: document.getElementById('support-tg').value
+                }
+            };
+            db.ref('exchangeSettings').update(updates).then(() => alert(adminTranslations[currentAdminLang].success));
         }
 
         db.ref('orders').on('value', (s) => {
             const list = document.getElementById('orders-list');
             list.innerHTML = "";
             let count = 0;
-            s.forEach(child => {
-                count++;
-                const o = child.val();
-                list.innerHTML = `
-                    <div class="item-card">
-                        <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('orders/${child.key}')"></i>
-                        <div class="item-meta"><span>${o.date}</span> <span>${o.app}</span></div>
-                        <div class="item-title">${o.amountSom} сом → ${o.amountYuan} ¥</div>
-                    </div>` + list.innerHTML;
+            s.forEach(child => { count++; const o = child.val();
+                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('orders/${child.key}')"></i><div class="item-meta"><span>${o.date}</span> <span>${o.app}</span></div><div class="item-title">${o.amountSom} сом → ${o.amountYuan} ¥</div></div>` + list.innerHTML;
             });
             document.getElementById('stat-orders').innerText = count;
             if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
@@ -223,31 +254,63 @@
 
         db.ref('reviews').on('value', (s) => {
             const list = document.getElementById('reviews-list');
-            list.innerHTML = "";
-            let count = 0;
-            s.forEach(child => {
-                count++;
-                const r = child.val();
+            list.innerHTML = ""; let count = 0;
+            s.forEach(child => { count++; const r = child.val();
                 const typeClass = r.type === 'neg' ? 'type-neg' : 'type-pos';
                 const typeText = r.type === 'neg' ? adminTranslations[currentAdminLang].neg : adminTranslations[currentAdminLang].pos;
-                list.innerHTML = `
-                    <div class="item-card">
-                        <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i>
-                        <div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span></div>
-                        <div class="review-type ${typeClass}">${typeText}</div>
-                        <div class="item-title">👤 ${r.name}</div>
-                        <div style="font-size: 13px; color: #444; margin-top: 5px;">${r.text}</div>
-                    </div>` + list.innerHTML;
+                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i><div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span></div><div class="review-type ${typeClass}">${typeText}</div><div class="item-title">👤 ${r.name}</div><div style="font-size: 13px; margin-top: 5px;">${r.text}</div></div>` + list.innerHTML;
             });
             document.getElementById('stat-reviews').innerText = count;
             if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
         });
 
-        function deleteItem(path) {
-            if(confirm(adminTranslations[currentAdminLang].confirm)) {
-                db.ref(path).remove();
-            }
+        function loadServices() {
+            db.ref('services').on('value', (s) => {
+                const list = document.getElementById('services-list');
+                list.innerHTML = "";
+                s.forEach(child => {
+                    const svc = child.val();
+                    list.innerHTML += `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('services/${child.key}')"></i><div class="item-title">${svc.name}</div><a href="${svc.link}" target="_blank" style="font-size:12px; color:var(--primary);">${svc.link}</a></div>`;
+                });
+                if(!s.exists()) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
+            });
         }
+
+        function loadUsers() {
+            db.ref('users').on('value', (s) => {
+                const list = document.getElementById('users-list');
+                list.innerHTML = "";
+                let count = 0;
+                s.forEach(child => {
+                    count++;
+                    const u = child.val();
+                    list.innerHTML += `
+                        <div class="user-card">
+                            <div class="user-info">
+                                <strong>${u.name} ${u.surname || ''}</strong><br>
+                                <small>${u.phone || ''}</small>
+                            </div>
+                            <div class="user-code-badge">🔑 ${u.code}</div>
+                            <i class="fas fa-trash-alt delete-user" onclick="deleteItem('users/${child.key}')"></i>
+                        </div>
+                    `;
+                });
+                if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
+            });
+        }
+
+        function addService() {
+            const name = document.getElementById('new-service-name').value;
+            const link = document.getElementById('new-service-link').value;
+            if(name && link) db.ref('services').push({ name, link }).then(() => { document.getElementById('new-service-name').value = ''; document.getElementById('new-service-link').value = ''; alert(adminTranslations[currentAdminLang].success); });
+        }
+
+        function deleteItem(path) { if(confirm(adminTranslations[currentAdminLang].confirm)) db.ref(path).remove(); }
+
+        showSection('section-rates');
+        loadServices();
+        loadUsers();
+        switchAdminLang('ky');
     </script>
 </body>
 </html>

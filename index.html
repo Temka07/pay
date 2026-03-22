@@ -1,60 +1,63 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ky">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Бүгүнкү юаньдын курсун билиңиз</title>
+    <title>Yuan Exchange | Моментальный обмен</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-
 <div class="app-container">
-    <div class="header-top">
-        <div class="menu-icon" onclick="toggleMenu()" style="font-size: 28px; background: white; padding: 5px 12px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">☰</div>
-        <div class="lang-switcher">
-            <button id="btn-ky" class="active" onclick="switchLang('ky')">KG</button>
-            <button id="btn-ru" onclick="switchLang('ru')">RU</button>
+    <!-- Sticky Header -->
+    <div class="sticky-header">
+        <div class="header-left">
+            <div class="menu-icon" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+            <div class="back-icon" onclick="goBack()" id="back-btn"><i class="fas fa-arrow-left"></i></div>
+        </div>
+        <div class="header-right">
+            <div class="lang-switcher">
+                <button id="btn-ky" class="active" onclick="switchLang('ky')">KG</button>
+                <button id="btn-ru" onclick="switchLang('ru')">RU</button>
+            </div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" id="dark-mode-toggle">🌙</button>
         </div>
     </div>
 
+    <!-- Главная страница -->
     <div id="page-home" class="page active">
-        <h1 id="txt-hello" onclick="adminTrigger()">Саламатсызбы!</h1>
+        <div id="welcome-block" class="welcome-card" onclick="handleWelcomeClick()"></div>
         <div class="promo-section" id="promo-display">...</div>
-
-        <div class="glass-card" style="margin-top: -10px; border-left: 5px solid var(--primary);">
-            <div id="txt-today-rate" style="font-weight: 800; font-size: 14px; margin-bottom: 10px; color: var(--primary);">🇨🇳 Юаньдын бүгүнкү курсу:</div>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                    <span id="txt-r-1">100ю чейин</span> <strong id="p-rate-1">--</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                    <span id="txt-r-2">100ю — 3000ю чейин</span> <strong id="p-rate-2">--</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                    <span id="txt-r-3">3000ю жогору</span> <strong id="p-rate-3">--</strong>
-                </div>
+        
+        <div class="glass-card rate-card">
+            <div id="txt-today-rate" class="rate-header">🇨🇳 Юаньдын бүгүнкү курсу:</div>
+            <div class="rate-rows">
+                <div class="rate-row"><span id="txt-r-1">100ю чейин</span> <strong id="p-rate-1">--</strong></div>
+                <div class="rate-row"><span id="txt-r-2">100ю — 3000ю чейин</span> <strong id="p-rate-2">--</strong></div>
+                <div class="rate-row"><span id="txt-r-3">3000ю жогору</span> <strong id="p-rate-3">--</strong></div>
             </div>
         </div>
 
-        <div class="steps-container" onclick="showPage('page-guide')" style="cursor:pointer; border: 1px solid #E5E5EA;">
-            <div class="step-item"><span class="step-num">1</span> <span id="step-1">Жазыңыз</span></div>
-            <div class="step-item"><span class="step-num">2</span> <span id="step-2">Которуңуз</span></div>
-            <div class="step-item"><span class="step-num">3</span> <span id="step-3">Чек жөнөтүңүз</span></div>
+        <div class="steps-container" onclick="showPage('page-guide')">
+            <div class="step-item"><span class="step-num">1</span> <span id="step-1" class="step-text">Жазыңыз</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><span class="step-num">2</span> <span id="step-2" class="step-text">Которуңуз</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><span class="step-num">3</span> <span id="step-3" class="step-text">Чек жөнөтүңүз</span></div>
         </div>
 
         <div class="glass-card">
             <label id="lbl-send">Сом жибересиз</label>
             <div class="input-box">
                 <input type="number" id="som-input" placeholder="0" oninput="calculate('som')" inputmode="decimal">
-                <span class="currency">KG</span>
+                <span class="currency">KGS</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('som', 500)">500с</button>
-                <button onclick="setVal('som', 1000)">1000с</button>
-                <button onclick="setVal('som', 5000)">5000с</button>
+                <button onclick="setVal('som', 500)">500</button>
+                <button onclick="setVal('som', 1000)">1000</button>
+                <button onclick="setVal('som', 5000)">5000</button>
                 <button onclick="focusInput('som-input')" id="btn-other-s" class="other-btn">Башка</button>
             </div>
         </div>
@@ -66,16 +69,16 @@
                 <span class="currency">CNY</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('yuan', 50)">50¥</button>
-                <button onclick="setVal('yuan', 100)">100¥</button>
-                <button onclick="setVal('yuan', 500)">500¥</button>
+                <button onclick="setVal('yuan', 50)">50</button>
+                <button onclick="setVal('yuan', 100)">100</button>
+                <button onclick="setVal('yuan', 500)">500</button>
                 <button onclick="focusInput('yuan-input')" id="btn-other-y" class="other-btn">Башка</button>
             </div>
         </div>
 
         <div class="app-selector">
-            <button id="ali-btn" class="active" onclick="setApp('Alipay')">Alipay</button>
-            <button id="we-btn" onclick="setApp('WeChat')">WeChat</button>
+            <button id="ali-btn" class="active" onclick="setApp('Alipay')"><i class="fab fa-alipay"></i> Alipay</button>
+            <button id="we-btn" onclick="setApp('WeChat')"><i class="fab fa-weixin"></i> WeChat</button>
         </div>
 
         <div class="rate-info"><span id="txt-cur-rate">Курс:</span> <strong id="current-rate">0.00</strong></div>
@@ -86,7 +89,7 @@
                 <div class="bank-text">
                     <span class="bank-name" id="bank-title">MBANK</span>
                     <strong id="bank-number">0998 792 579</strong>
-                    <span class="bank-owner">...</span>
+                    <span class="bank-owner"></span>
                 </div>
                 <button class="mini-copy-btn" id="btn-copy">Көчүрүү</button>
             </div>
@@ -96,45 +99,131 @@
         <button class="main-submit-btn" onclick="sendOrder()" id="btn-main">АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ</button>
     </div>
 
+    <!-- Нускама страницасы -->
     <div id="page-guide" class="page">
         <h2 id="guide-title">Кантип сатып алуу керек?</h2>
-        <div class="guide-content" style="background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-            <div class="guide-step" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;"><div class="num-b" style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">1</div><p id="g-step-1">Сумма жазыныз...</p></div>
-            <div class="guide-step" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;"><div class="num-b" style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">2</div><p id="g-step-2">Которосуз...</p></div>
-            <div class="guide-step" style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;"><div class="num-b" style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">3</div><p id="g-step-3">Чек жибересиз...</p></div>
+        <div class="glass-card guide-content">
+            <div class="guide-step"><div class="num-b">1</div><p id="g-step-1"></p></div>
+            <div class="guide-step"><div class="num-b">2</div><p id="g-step-2"></p></div>
+            <div class="guide-step"><div class="num-b">3</div><p id="g-step-3"></p></div>
         </div>
-        <button class="back-btn" onclick="showPage('page-home')" id="btn-back-1" style="width: 100%; padding: 20px; margin-top: 20px; font-size: 18px; font-weight: 800; border-radius: 20px;">АРТКА КАЙТУУ</button>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-1">АРТКА КАЙТУУ</button>
     </div>
 
+    <!-- Курс страницасы -->
+    <div id="page-course" class="page">
+        <h2 id="course-title">Курстар</h2>
+        <div class="glass-card">
+            <div id="course-links" class="service-buttons"></div>
+        </div>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+    </div>
+
+    <!-- Поддержка страницасы -->
+    <div id="page-support" class="page">
+        <h2 id="support-title">Колдоо</h2>
+        <div class="glass-card">
+            <div id="support-links" class="support-contacts"></div>
+        </div>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+    </div>
+
+    <!-- Канал страницасы -->
+    <div id="page-channel" class="page">
+        <h2 id="channel-title">Биздин канал</h2>
+        <div class="glass-card">
+            <a id="channel-link" href="#" target="_blank" class="service-btn" style="display: flex; justify-content: center; gap: 10px;">
+                <i class="fab fa-telegram"></i> Telegram каналга өтүү
+            </a>
+        </div>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+    </div>
+
+    <!-- Услугалар страницасы (модулдук) -->
+    <div id="page-services" class="page">
+        <h2 id="services-title">Услугалар</h2>
+        <div id="services-container" class="glass-card service-buttons"></div>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+    </div>
+
+    <!-- Пикирлер страницасы -->
     <div id="page-reviews" class="page">
         <h2 id="reviews-title">Кардарлардын ойлору</h2>
-        <div id="reviews-container" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;"></div>
-        
-        <div class="add-review" style="background: white; padding: 15px; border-radius: 20px; border: 1.5px solid #E5E5EA;">
-            <h3 id="add-rev-title" style="font-size: 16px; margin-bottom: 10px;">Пикир калтыруу</h3>
+        <div id="reviews-container" class="reviews-scroll"></div>
+        <div class="glass-card add-review">
+            <h3 id="add-rev-title">Пикир калтыруу</h3>
             <input type="text" id="rev-name" placeholder="Атыңыз">
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button id="type-pos" onclick="setRevType('pos')" style="flex:1; background: #F2F2F7; color: black; padding: 10px; border-radius: 12px; font-size: 13px; border: 2px solid transparent;">😻 Положительный</button>
-                <button id="type-neg" onclick="setRevType('neg')" style="flex:1; background: #F2F2F7; color: black; padding: 10px; border-radius: 12px; font-size: 13px; border: 2px solid transparent;">😾 Отрицательный</button>
+            <div class="rev-type-btns">
+                <button id="type-pos" onclick="setRevType('pos')" class="rev-btn pos">😻 Жагымдуу</button>
+                <button id="type-neg" onclick="setRevType('neg')" class="rev-btn neg">😾 Нааразы</button>
             </div>
-
-            <textarea id="rev-text" placeholder="Пикириңиз..."></textarea>
-            <button id="btn-submit-rev" onclick="submitReview()" style="background: var(--primary); color: white; width: 100%; padding: 15px; border-radius: 15px; font-weight: 800; border:none;">ЖӨНӨТҮҮ</button>
+            <textarea id="rev-text" placeholder="Оюңузду билдириңиз..." rows="3"></textarea>
+            <button id="btn-submit-rev" class="main-submit-btn" onclick="submitReview()">ЖӨНӨТҮҮ</button>
         </div>
-        <button class="back-btn" onclick="showPage('page-home')" id="btn-back-2" style="width: 100%; padding: 20px; margin-top: 20px; font-size: 18px; font-weight: 800; border-radius: 20px;">АРТКА КАЙТУУ</button>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-2">АРТКА КАЙТУУ</button>
     </div>
 </div>
 
+<!-- Сайдбар меню -->
 <div id="side-menu" class="side-menu">
-    <div class="menu-close" onclick="toggleMenu()">✕</div>
-    <a href="#" onclick="showPage('page-home')" class="menu-link" id="m-home">🏠 Башкы бет</a>
-    <a href="#" onclick="showPage('page-guide')" class="menu-link" id="m-guide">❓ Инструкции</a>
-    <a href="#" onclick="showPage('page-reviews')" class="menu-link" id="m-reviews">⭐ Отзывтар</a>
-    <a href="https://t.me/alipei_0" target="_blank" class="menu-link" id="m-lesson" style="color: var(--ali); font-weight: 800;">📱 Алипей ачуу урок</a>
-    <a href="https://wa.me/996998792579" target="_blank" class="menu-link" id="m-support">📞 Колдоо кызматы</a>
+    <div class="menu-close" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+    <div id="menu-user-info"></div>
+    <div class="menu-items">
+        <a href="#" onclick="showPage('page-home'); toggleMenu()" class="menu-link" id="m-home">🏠 Башкы бет</a>
+        <a href="#" onclick="showPage('page-guide'); toggleMenu()" class="menu-link" id="m-guide">❓ Нускама</a>
+        <a href="#" onclick="showPage('page-course'); toggleMenu()" class="menu-link" id="m-course">💰 Курстар</a>
+        <a href="#" onclick="showPage('page-support'); toggleMenu()" class="menu-link" id="m-support">🛟 Колдоо</a>
+        <a href="#" onclick="showPage('page-channel'); toggleMenu()" class="menu-link" id="m-channel">📢 Канал</a>
+        <a href="#" onclick="showPage('page-services'); toggleMenu()" class="menu-link" id="m-services">⚙️ Услугалар</a>
+        <a href="#" onclick="showPage('page-reviews'); toggleMenu()" class="menu-link" id="m-reviews">⭐ Пикирлер</a>
+        <div class="menu-divider" id="m-div-auth">Аккаунт</div>
+        <a href="#" onclick="logout()" class="menu-link" id="m-logout">🚪 Чыгуу</a>
+    </div>
+</div>
+<div id="menu-overlay" onclick="toggleMenu()"></div>
+
+<!-- Auth Modal (регистрация/кирүү) -->
+<div id="auth-modal" class="auth-modal" style="display: none;">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h3 id="auth-title">Кош келиңиз!</h3>
+            <div class="auth-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></div>
+        </div>
+        <div id="auth-forms">
+            <!-- Регистрация формасы -->
+            <div id="register-form" class="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="reg-name" placeholder="Атыңыз">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-user-tag"></i>
+                    <input type="text" id="reg-surname" placeholder="Фамилияңыз">
+                </div>
+                <div class="input-group">
+                    <i class="fab fa-whatsapp"></i>
+                    <input type="tel" id="reg-phone" placeholder="WhatsApp номер (996XXXYYZZ)">
+                </div>
+                <button class="auth-btn" onclick="register()" id="reg-btn">Катталуу</button>
+                <span class="switch-auth" onclick="toggleAuthForm()" id="switch-to-login">Кодуңуз бар? Кирүү</span>
+            </div>
+            <!-- Кирүү формасы -->
+            <div id="login-form" class="auth-form" style="display:none;">
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="login-code" placeholder="4-значный код" maxlength="4" inputmode="numeric">
+                </div>
+                <button class="auth-btn" onclick="login()" id="login-btn">Кирүү</button>
+                <span class="switch-auth" onclick="toggleAuthForm()" id="switch-to-reg">Аккаунтуңуз жок? Катталуу</span>
+            </div>
+        </div>
+        <div id="auth-message" class="auth-message"></div>
+    </div>
 </div>
 
-<script src="script.js"></script>
+<script src="config.js"></script>
+<script src="translations.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
