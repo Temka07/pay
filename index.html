@@ -211,7 +211,7 @@
             <div id="login-form" class="auth-form" style="display:none;">
                 <div class="input-group">
                     <i class="fas fa-key"></i>
-                    <input type="text" id="login-code" placeholder="4-значный код" maxlength="4" inputmode="numeric">
+                    <input type="text" id="login-code" placeholder="Кодуңуз (4 сан же админ код)" maxlength="20" inputmode="text">
                 </div>
                 <button class="auth-btn" onclick="login()" id="login-btn">Кирүү</button>
                 <span class="switch-auth" onclick="toggleAuthForm()" id="switch-to-reg">Аккаунтуңуз жок? Катталуу</span>
@@ -221,30 +221,58 @@
     </div>
 </div>
 
-<!-- Скрытый доступ к админ панели (5 быстрых кликов) -->
-<div id="admin-hidden-trigger" style="position: fixed; bottom: 10px; right: 10px; width: 30px; height: 30px; opacity: 0; z-index: 9999; cursor: pointer;"></div>
-
 <script src="config.js"></script>
 <script src="translations.js"></script>
 <script src="auth.js"></script>
 <script src="app.js"></script>
 
 <script>
-    // Жашыруун админ панелине кирүү (5 жолу басуу)
-    let adminClickCount = 0;
-    let adminTimeout;
-    const adminTrigger = document.getElementById('admin-hidden-trigger');
-    if (adminTrigger) {
-        adminTrigger.addEventListener('click', () => {
-            adminClickCount++;
-            clearTimeout(adminTimeout);
-            adminTimeout = setTimeout(() => { adminClickCount = 0; }, 1000);
-            if (adminClickCount >= 5) {
-                adminClickCount = 0;
+// ============ АДМИН ПАНЕЛИНЕ КИРҮҮ ҮЧҮН КОШУМЧА МЕХАНИЗМДЕР ============
+
+// 1-ЫКМА: Welcome блокту 5 жолу басуу (админ кирүү үчүн)
+const adminWelcomeBlock = document.getElementById('welcome-block');
+if (adminWelcomeBlock) {
+    let adminTapCount = 0;
+    let adminTapTimeout;
+    adminWelcomeBlock.addEventListener('click', (e) => {
+        // Эгер auth modal ачык болсо, ага тоскоол болбошу үчүн
+        if (document.getElementById('auth-modal')?.style.display === 'flex') {
+            return;
+        }
+        adminTapCount++;
+        clearTimeout(adminTapTimeout);
+        adminTapTimeout = setTimeout(() => { adminTapCount = 0; }, 800);
+        if (adminTapCount >= 5) {
+            adminTapCount = 0;
+            // Админ кирүү үчүн атайын диалог көрсөтүү
+            const adminCode = prompt("Админ кодуңузду киргизиңиз (6 символ):");
+            if (adminCode === "197907") {
                 window.open('admin.html', '_blank');
+            } else if (adminCode) {
+                alert("Код туура эмес!");
             }
-        });
-    }
+        }
+    });
+}
+
+// 2-ЫКМА: Консоль аркылуу админ панелин ачуунун алдын алуу эмес, бирок эскертүү
+console.log("%c🔒 Админ панелине кирүү үчүн атайын код керек: 197907", "color: #5856D6; font-size: 14px; font-weight: bold;");
+
+// 3-ЫКМА: Сайттын төмөнкү сол бурчунда кичине индикатор (милдеттүү эмес, бирок пайдалуу)
+// Бул индикаторду көргөндө, админ режимине кирүү мүмкүн экенин билесиз
+const adminIndicator = document.createElement('div');
+adminIndicator.style.position = 'fixed';
+adminIndicator.style.bottom = '10px';
+adminIndicator.style.left = '10px';
+adminIndicator.style.width = '8px';
+adminIndicator.style.height = '8px';
+adminIndicator.style.backgroundColor = '#5856D6';
+adminIndicator.style.borderRadius = '50%';
+adminIndicator.style.opacity = '0.3';
+adminIndicator.style.zIndex = '9999';
+adminIndicator.title = 'Админ режими: 197907';
+document.body.appendChild(adminIndicator);
 </script>
+
 </body>
 </html>

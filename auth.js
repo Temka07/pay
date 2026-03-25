@@ -1,5 +1,8 @@
  // ============ AUTH SYSTEM ============
 
+// АДМИН КОДУ (6 символдуу, уникалдуу)
+const ADMIN_SECRET_CODE = "YUAN2026";  // Кааласаңыз өзгөртө аласыз
+
 function showAuthModal() {
     const t = translations[currentLang];
     const modal = document.getElementById('auth-modal');
@@ -49,7 +52,7 @@ function toggleAuthForm() {
     if (msgDiv) msgDiv.innerHTML = '';
 }
 
-// 4 орундуу уникалдуу код түзүү
+// 4 орундуу колдонуучу коду
 function generateUserCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
@@ -133,7 +136,7 @@ function register() {
         });
 }
 
-// ============ КИРҮҮ ============
+// ============ КИРҮҮ (АДМИН КОДУ МЕНЕН) ============
 function login() {
     const t = translations[currentLang];
     const code = document.getElementById('login-code')?.value.trim();
@@ -145,44 +148,59 @@ function login() {
         return;
     }
     
-    // Бардык колдонуучуларды издөө
-    db.ref('users').orderByChild('code').equalTo(code).once('value')
-        .then((snapshot) => {
-            console.log('Query result:', snapshot.exists());
-            
-            if (snapshot.exists()) {
-                let userData = null;
-                let userId = null;
-                snapshot.forEach((child) => {
-                    userData = child.val();
-                    userId = child.key;
-                });
+    // === АДМИН ТЕКШЕРҮҮ (6 орундуу атайын код) ===
+    if (code === ADMIN_SECRET_CODE) {
+        console.log('Admin login detected!');
+        // Админ панелин жаңы терезеде ачуу
+        window.open('admin.html', '_blank');
+        closeAuthModal();
+        return;
+    }
+    
+    // === КАДИМКИ КОЛДОНУУЧУНУ ТЕКШЕРҮҮ (4 орундуу код) ===
+    // Эгер код 4 орундуу сан болсо, кадимки колдонуучуну изде
+    if (/^\d{4}$/.test(code)) {
+        db.ref('users').orderByChild('code').equalTo(code).once('value')
+            .then((snapshot) => {
+                console.log('User query result:', snapshot.exists());
                 
-                if (userData) {
-                    currentUser = {
-                        name: userData.name,
-                        surname: userData.surname,
-                        phone: userData.phone,
-                        code: userData.code,
-                        id: userId
-                    };
-                    localStorage.setItem('user', JSON.stringify(currentUser));
+                if (snapshot.exists()) {
+                    let userData = null;
+                    let userId = null;
+                    snapshot.forEach((child) => {
+                        userData = child.val();
+                        userId = child.key;
+                    });
                     
-                    showAuthMessage(t.login_welcome + currentUser.name + '!', false);
-                    
-                    setTimeout(() => {
-                        closeAuthModal();
-                        updateUserInterface();
-                    }, 1500);
+                    if (userData) {
+                        currentUser = {
+                            name: userData.name,
+                            surname: userData.surname,
+                            phone: userData.phone,
+                            code: userData.code,
+                            id: userId
+                        };
+                        localStorage.setItem('user', JSON.stringify(currentUser));
+                        
+                        showAuthMessage(t.login_welcome + currentUser.name + '!', false);
+                        
+                        setTimeout(() => {
+                            closeAuthModal();
+                            updateUserInterface();
+                        }, 1500);
+                    }
+                } else {
+                    showAuthMessage(t.login_failed);
                 }
-            } else {
-                showAuthMessage(t.login_failed);
-            }
-        })
-        .catch((error) => {
-            console.error('Login error:', error);
-            showAuthMessage('Кирүүдө ката: ' + error.message);
-        });
+            })
+            .catch((error) => {
+                console.error('Login error:', error);
+                showAuthMessage('Кирүүдө ката: ' + error.message);
+            });
+    } else {
+        // Код туура эмес форматта
+        showAuthMessage(t.login_failed);
+    }
 }
 
 // ============ ЧЫГУУ ============
