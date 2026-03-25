@@ -1,4 +1,4 @@
-const translations = {
+ const translations = {
     ky: {
         // Header & Menu
         hello: "Саламатсызбы!",
@@ -69,11 +69,10 @@ const translations = {
         
         // Auth
         auth_title: "Кош келиңиз!",
-        auth_welcome: "Катталып же кирип, кызматтарды колдонуңуз",
+        enter_code: "Кодуңуз",
         name_label: "Атыңыз",
         surname_label: "Фамилияңыз",
         phone_label: "WhatsApp номери",
-        enter_code: "4-значный код",
         register_btn: "Катталуу",
         login_btn: "Кирүү",
         have_account: "Кодуңуз бар? Кирүү",
@@ -161,11 +160,10 @@ const translations = {
         
         // Auth
         auth_title: "Добро пожаловать!",
-        auth_welcome: "Зарегистрируйтесь или войдите, чтобы пользоваться сервисами",
+        enter_code: "Ваш код",
         name_label: "Имя",
         surname_label: "Фамилия",
         phone_label: "Номер WhatsApp",
-        enter_code: "4-значный код",
         register_btn: "Зарегистрироваться",
         login_btn: "Войти",
         have_account: "Есть код? Войти",

@@ -1,36 +1,41 @@
-// Auth Functions
+ // ============ AUTH SYSTEM ============
 
 function showAuthModal() {
     const t = translations[currentLang];
     const modal = document.getElementById('auth-modal');
-    const title = document.getElementById('auth-title');
-    if (title) title.innerText = t.auth_title;
-    modal.style.display = 'flex';
+    if (!modal) return;
     
-    // Clear message
+    // Формаларды тазалоо
+    const regName = document.getElementById('reg-name');
+    const regSurname = document.getElementById('reg-surname');
+    const regPhone = document.getElementById('reg-phone');
+    const loginCode = document.getElementById('login-code');
     const msgDiv = document.getElementById('auth-message');
+    
+    if (regName) regName.value = '';
+    if (regSurname) regSurname.value = '';
+    if (regPhone) regPhone.value = '';
+    if (loginCode) loginCode.value = '';
     if (msgDiv) msgDiv.innerHTML = '';
     
-    // Clear inputs
-    const nameInput = document.getElementById('reg-name');
-    const surnameInput = document.getElementById('reg-surname');
-    const phoneInput = document.getElementById('reg-phone');
-    const codeInput = document.getElementById('login-code');
-    if (nameInput) nameInput.value = '';
-    if (surnameInput) surnameInput.value = '';
-    if (phoneInput) phoneInput.value = '';
-    if (codeInput) codeInput.value = '';
+    // Регистрация формасын көрсөтүү
+    const regForm = document.getElementById('register-form');
+    const loginForm = document.getElementById('login-form');
+    if (regForm) regForm.style.display = 'block';
+    if (loginForm) loginForm.style.display = 'none';
+    
+    modal.style.display = 'flex';
 }
 
 function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
-    const msgDiv = document.getElementById('auth-message');
-    if (msgDiv) msgDiv.innerHTML = '';
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 function toggleAuthForm() {
     const regForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
+    if (!regForm || !loginForm) return;
     
     if (regForm.style.display !== 'none') {
         regForm.style.display = 'none';
@@ -40,20 +45,19 @@ function toggleAuthForm() {
         loginForm.style.display = 'none';
     }
     
-    // Clear message when toggling
     const msgDiv = document.getElementById('auth-message');
     if (msgDiv) msgDiv.innerHTML = '';
 }
 
+// 4 орундуу уникалдуу код түзүү
 function generateUserCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
+// WhatsApp номерин текшерүү
 function validatePhone(phone) {
-    // Remove any non-digit characters
     const cleaned = phone.replace(/\D/g, '');
-    // Check if it's a valid Kyrgyz phone number (starts with 996, 9-12 digits total)
-    return cleaned.length >= 9 && cleaned.length <= 12;
+    return cleaned.length >= 8 && cleaned.length <= 15;
 }
 
 function showAuthMessage(message, isError = true) {
@@ -64,17 +68,20 @@ function showAuthMessage(message, isError = true) {
         setTimeout(() => {
             if (msgDiv.innerHTML === message) {
                 msgDiv.innerHTML = '';
-                msgDiv.className = 'auth-message';
             }
         }, 3000);
     }
 }
 
+// ============ РЕГИСТРАЦИЯ ============
 function register() {
     const t = translations[currentLang];
+    
     const name = document.getElementById('reg-name')?.value.trim();
     const surname = document.getElementById('reg-surname')?.value.trim();
     const phone = document.getElementById('reg-phone')?.value.trim();
+    
+    console.log('Register attempt:', { name, surname, phone });
     
     if (!name || !surname || !phone) {
         showAuthMessage(t.error_fill);
@@ -87,81 +94,107 @@ function register() {
     }
     
     const code = generateUserCode();
+    const userId = Date.now().toString();
     
-    db.ref('users').push({
+    const userData = {
         name: name,
         surname: surname,
         phone: phone,
         code: code,
         createdAt: Date.now()
-    }).then(() => {
-        showAuthMessage(t.reg_success + code, false);
-        
-        // Auto login after registration
-        currentUser = { name: name, surname: surname, phone: phone, code: code };
-        localStorage.setItem('user', JSON.stringify(currentUser));
-        
-        setTimeout(() => {
-            closeAuthModal();
-            updateUserInterface();
-            showAuthMessage('', false);
-        }, 2000);
-    }).catch((error) => {
-        console.error('Registration error:', error);
-        showAuthMessage('Каттоодо ката кетти. Кайра аракет кылыңыз.');
-    });
+    };
+    
+    console.log('Saving user:', userData);
+    
+    // Firebaseге жазуу
+    db.ref('users/' + userId).set(userData)
+        .then(() => {
+            console.log('User saved successfully');
+            showAuthMessage(t.reg_success + code, false);
+            
+            // Автоматтык кирүү
+            currentUser = { 
+                name: name, 
+                surname: surname, 
+                phone: phone, 
+                code: code,
+                id: userId
+            };
+            localStorage.setItem('user', JSON.stringify(currentUser));
+            
+            setTimeout(() => {
+                closeAuthModal();
+                updateUserInterface();
+            }, 2000);
+        })
+        .catch((error) => {
+            console.error('Registration error:', error);
+            showAuthMessage('Каттоодо ката: ' + error.message);
+        });
 }
 
+// ============ КИРҮҮ ============
 function login() {
     const t = translations[currentLang];
     const code = document.getElementById('login-code')?.value.trim();
+    
+    console.log('Login attempt with code:', code);
     
     if (!code) {
         showAuthMessage(t.error_fill);
         return;
     }
     
-    db.ref('users').orderByChild('code').equalTo(code).once('value', (snapshot) => {
-        if (snapshot.exists()) {
-            let userData = null;
-            snapshot.forEach((child) => {
-                userData = child.val();
-                userData.id = child.key;
-            });
+    // Бардык колдонуучуларды издөө
+    db.ref('users').orderByChild('code').equalTo(code).once('value')
+        .then((snapshot) => {
+            console.log('Query result:', snapshot.exists());
             
-            if (userData) {
-                currentUser = {
-                    name: userData.name,
-                    surname: userData.surname,
-                    phone: userData.phone,
-                    code: userData.code
-                };
-                localStorage.setItem('user', JSON.stringify(currentUser));
+            if (snapshot.exists()) {
+                let userData = null;
+                let userId = null;
+                snapshot.forEach((child) => {
+                    userData = child.val();
+                    userId = child.key;
+                });
                 
-                showAuthMessage(t.login_welcome + currentUser.name + '!', false);
-                
-                setTimeout(() => {
-                    closeAuthModal();
-                    updateUserInterface();
-                    showAuthMessage('', false);
-                }, 1500);
+                if (userData) {
+                    currentUser = {
+                        name: userData.name,
+                        surname: userData.surname,
+                        phone: userData.phone,
+                        code: userData.code,
+                        id: userId
+                    };
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    
+                    showAuthMessage(t.login_welcome + currentUser.name + '!', false);
+                    
+                    setTimeout(() => {
+                        closeAuthModal();
+                        updateUserInterface();
+                    }, 1500);
+                }
+            } else {
+                showAuthMessage(t.login_failed);
             }
-        } else {
-            showAuthMessage(t.login_failed);
-        }
-    }).catch((error) => {
-        console.error('Login error:', error);
-        showAuthMessage('Кирүүдө ката кетти. Кайра аракет кылыңыз.');
-    });
+        })
+        .catch((error) => {
+            console.error('Login error:', error);
+            showAuthMessage('Кирүүдө ката: ' + error.message);
+        });
 }
 
+// ============ ЧЫГУУ ============
 function logout() {
     currentUser = null;
     localStorage.removeItem('user');
     updateUserInterface();
-    showPage('page-home');
+    if (typeof showPage === 'function') showPage('page-home');
+    if (typeof toggleMenu === 'function') toggleMenu(false);
 }
 
+// ============ ИНТЕРФЕЙСТИ ЖАҢЫРТУУ ============
 function handleWelcomeClick() {
     if (!currentUser) {
         showAuthModal();
@@ -173,29 +206,39 @@ function updateUserInterface() {
     const welcomeBlock = document.getElementById('welcome-block');
     const menuUserInfo = document.getElementById('menu-user-info');
     
+    console.log('Updating UI, currentUser:', currentUser);
+    
     if (currentUser) {
-        // Main page welcome block
-        welcomeBlock.innerHTML = `
-            <div class="welcome-name">${t.welcome_back} ${currentUser.name} ${currentUser.surname || ''}!</div>
-            <div class="welcome-code">🔑 ${t.enter_code}: ${currentUser.code}</div>
-        `;
+        // Башкы беттеги welcome блок
+        if (welcomeBlock) {
+            welcomeBlock.innerHTML = `
+                <div class="welcome-name">👋 ${t.welcome_back} ${currentUser.name} ${currentUser.surname || ''}!</div>
+                <div class="welcome-code">🔑 ${t.enter_code}: <strong>${currentUser.code}</strong></div>
+                <div class="welcome-phone">📱 ${currentUser.phone || ''}</div>
+            `;
+            welcomeBlock.style.cursor = 'default';
+        }
         
-        // Sidebar user info
+        // Сайдбардагы колдонуучу маалыматы
         if (menuUserInfo) {
             menuUserInfo.innerHTML = `
                 <div class="menu-user-name">${currentUser.name} ${currentUser.surname || ''}</div>
                 <div class="menu-user-code">🔑 ${currentUser.code}</div>
+                <div class="menu-user-phone" style="font-size: 11px; opacity:0.7;">${currentUser.phone || ''}</div>
             `;
         }
     } else {
-        welcomeBlock.innerHTML = `
-            <div class="welcome-login">👋 ${t.login_register}</div>
-        `;
+        if (welcomeBlock) {
+            welcomeBlock.innerHTML = `
+                <div class="welcome-login">👋 ${t.login_register}</div>
+            `;
+            welcomeBlock.style.cursor = 'pointer';
+        }
         
         if (menuUserInfo) {
             menuUserInfo.innerHTML = `
                 <div class="menu-user-name">${t.welcome}</div>
-                <div class="menu-user-code" style="font-size: 12px; opacity: 0.8;">${t.login_register}</div>
+                <div class="menu-user-code" style="font-size: 12px;">${t.login_register}</div>
             `;
         }
     }
@@ -206,10 +249,31 @@ function checkAuth() {
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
+            console.log('Loaded user from localStorage:', currentUser);
         } catch (e) {
             console.error('Error parsing user data:', e);
             currentUser = null;
         }
     }
     updateUserInterface();
+}
+
+// Тест үчүн демо колдонуучу түзүү (керек болсо)
+function createDemoUser() {
+    const demoCode = "1234";
+    const demoUser = {
+        name: "Тест",
+        surname: "Колдонуучу",
+        phone: "996700123456",
+        code: demoCode,
+        id: "demo123"
+    };
+    
+    // Firebaseге сактоо
+    db.ref('users/demo123').set(demoUser)
+        .then(() => {
+            console.log('Demo user created with code: 1234');
+            alert('Демо колдонуучу түзүлдү! Коду: 1234');
+        })
+        .catch(err => console.error('Error:', err));
 }

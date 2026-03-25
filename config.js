@@ -1,4 +1,4 @@
-// Firebase Configuration
+ // Firebase Configuration
 const firebaseConfig = {
     databaseURL: "https://yuanexchange-2fe09-default-rtdb.europe-west1.firebasedatabase.app/"
 };
@@ -15,7 +15,8 @@ let settings = {
     promoRates: { r1: "--", r2: "--", r3: "--" },
     bank: { name: "MBANK", number: "0998792579", owner: "Алмаз Т." },
     channelLink: "https://t.me/yuan_exchange",
-    support: { whatsapp: "996990032007", telegram: "Temka007z" }
+    support: { whatsapp: "996990032007", telegram: "Temka007z" },
+    services: []
 };
 
 // Global Variables
