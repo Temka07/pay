@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ky">
 <head>
     <meta charset="UTF-8">
@@ -311,6 +311,14 @@
         loadServices();
         loadUsers();
         switchAdminLang('ky');
+        
+        // Канал шилтемесин алдын ала орнотуу (эгер Firebase бош болсо)
+        const defaultChannel = "https://t.me/alipei_2026";
+        db.ref('exchangeSettings/channelLink').once('value', (snap) => {
+            if(!snap.exists()){
+                db.ref('exchangeSettings/channelLink').set(defaultChannel);
+            }
+        });
     </script>
 </body>
 </html>

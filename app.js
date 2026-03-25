@@ -305,11 +305,14 @@ function loadSupportLinks() {
 }
 
 function loadChannelLink() {
-    const channelLink = document.getElementById('channel-link');
-    if (channelLink) {
+    const channelLinkElem = document.getElementById('channel-link');
+    if (channelLinkElem) {
         db.ref('exchangeSettings/channelLink').on('value', (snap) => {
             if (snap.exists()) {
-                channelLink.href = snap.val();
+                channelLinkElem.href = snap.val();
+            } else {
+                // Default channel link
+                channelLinkElem.href = "https://t.me/alipei_2026";
             }
         });
     }
