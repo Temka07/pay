@@ -1,7 +1,7 @@
  // ============ AUTH SYSTEM ============
 
-// АДМИН КОДУ (6 символдуу, уникалдуу)
-const ADMIN_SECRET_CODE = "YUAN2026";  // Кааласаңыз өзгөртө аласыз
+// АДМИН КОДУ (6 орундуу, уникалдуу)
+const ADMIN_SECRET_CODE = "197907";
 
 function showAuthModal() {
     const t = translations[currentLang];
@@ -52,7 +52,7 @@ function toggleAuthForm() {
     if (msgDiv) msgDiv.innerHTML = '';
 }
 
-// 4 орундуу колдонуучу коду
+// 4 орундуу колдонуучу коду (1000-9999)
 function generateUserCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
@@ -150,7 +150,7 @@ function login() {
     
     // === АДМИН ТЕКШЕРҮҮ (6 орундуу атайын код) ===
     if (code === ADMIN_SECRET_CODE) {
-        console.log('Admin login detected!');
+        console.log('Admin login detected! Opening admin panel...');
         // Админ панелин жаңы терезеде ачуу
         window.open('admin.html', '_blank');
         closeAuthModal();
@@ -198,7 +198,7 @@ function login() {
                 showAuthMessage('Кирүүдө ката: ' + error.message);
             });
     } else {
-        // Код туура эмес форматта
+        // Код туура эмес форматта (4 орундуу сан эмес, админ коду да эмес)
         showAuthMessage(t.login_failed);
     }
 }
@@ -295,3 +295,18 @@ function createDemoUser() {
         })
         .catch(err => console.error('Error:', err));
 }
+
+// ============ АДМИН КИРҮҮ ҮЧҮН КОШУМЧА МЕХАНИЗМ ============
+// Бул функцияны консоль аркылуу да чакырууга болот
+function openAdminPanel() {
+    const adminCode = prompt("Админ кодуңузду киргизиңиз:");
+    if (adminCode === ADMIN_SECRET_CODE) {
+        window.open('admin.html', '_blank');
+    } else if (adminCode) {
+        alert("Код туура эмес!");
+    }
+}
+
+// Консольго маалымат чыгаруу (админдер үчүн)
+console.log("%c🔒 Админ панелине кирүү үчүн код: " + ADMIN_SECRET_CODE, "color: #5856D6; font-size: 14px; font-weight: bold;");
+console.log("%c💡 openAdminPanel() функциясын чакырып да кирсеңиз болот", "color: #34C759; font-size: 12px;");
