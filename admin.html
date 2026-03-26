@@ -33,18 +33,8 @@
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-box { background: var(--card-bg); padding: 15px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
         .stat-num { font-size: 20px; font-weight: 900; color: var(--primary); }
-        .review-type { font-size: 12px; padding: 4px 8px; border-radius: 8px; display: inline-block; }
-        .type-pos { background: #E8F5E9; color: #2E7D32; }
-        .type-neg { background: #FFEBEE; color: #C62828; }
-        .lang-btns { display: flex; gap: 5px; }
-        .lang-btns button { padding: 8px 12px; font-size: 12px; width: auto; border-radius: 10px; background: #ddd; }
-        .lang-btns button.active { background: var(--primary); color: white; }
-        .dark-mode-toggle { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 30px; cursor: pointer; font-size: 18px; }
-        .users-list { max-height: 400px; overflow-y: auto; }
-        .user-card { background: var(--bg); padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .user-info { flex: 1; }
-        .user-code-badge { background: var(--primary); color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: bold; font-family: monospace; }
-        .delete-user { color: var(--danger); cursor: pointer; padding: 5px 10px; }
+        .promo-item-admin { background: var(--bg); padding: 15px; border-radius: 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+        .btn-small { width: auto; padding: 8px 16px; margin: 5px; background: var(--danger); color: white; border-radius: 12px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -67,6 +57,7 @@
         <a class="nav-link" onclick="showSection('section-reviews')" id="nav-reviews">Отзывтар</a>
         <a class="nav-link" onclick="showSection('section-services')" id="nav-services">Услугалар</a>
         <a class="nav-link" onclick="showSection('section-users')" id="nav-users">Колдонуучулар</a>
+        <a class="nav-link" onclick="showSection('section-promotions')" id="nav-promotions">🏷️ Акциялар</a>
     </div>
 
     <div class="stat-grid">
@@ -88,14 +79,6 @@
             <input type="number" id="we-t2" step="0.01" placeholder="T2 (<15000с)">
             <input type="number" id="we-t3" step="0.01" placeholder="T3 (>15000с)">
         </div>
-        <label id="lbl-promo-rates" style="font-size: 12px; color: #5856D6; font-weight: bold;">Жарнама блогундагы курс:</label>
-        <div class="grid">
-            <input type="number" id="promo-rate-1" step="0.01" placeholder="100ю чейин">
-            <input type="number" id="promo-rate-2" step="0.01" placeholder="100-3000ю">
-            <input type="number" id="promo-rate-3" step="0.01" placeholder="3000ю жогору">
-        </div>
-        <label id="lbl-promo-text">Жарнама тексти</label>
-        <input type="text" id="promo-text" placeholder="...">
         <label>Telegram канал шилтемеси</label>
         <input type="text" id="channel-link" placeholder="https://t.me/...">
         <button id="btn-update-rates" class="btn-save" onclick="updateRates()" style="margin-top: 15px;">КУРСТАРДЫ ЖАҢЫРТУУ</button>
@@ -138,6 +121,23 @@
         <div id="users-list" class="users-list"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
     </div>
 
+    <!-- ЖАҢЫ: Акцияларды башкаруу бөлүмү -->
+    <div id="section-promotions" class="card" style="display:none;">
+        <h2><i class="fas fa-tags"></i> Акцияларды башкаруу</h2>
+        
+        <div style="background: var(--bg); padding: 15px; border-radius: 16px; margin-bottom: 20px;">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">➕ Жаңы акция кошуу</h3>
+            <input type="text" id="promo-title" placeholder="Акциянын аталышы (мис: Күзгү бонустар!)">
+            <textarea id="promo-desc" placeholder="Акциянын сүрөттөмөсү..." rows="2"></textarea>
+            <input type="text" id="promo-code" placeholder="Промокод (мис: AUTUMN10)">
+            <input type="datetime-local" id="promo-expiry" placeholder="Акциянын аяктаган убактысы">
+            <button class="btn-save" onclick="addPromotion()" style="margin-top: 5px;">➕ Акция кошуу</button>
+        </div>
+        
+        <h3 style="font-size: 14px; margin-bottom: 10px;">📋 Учурдагы акциялар</h3>
+        <div id="promotions-list" class="list-container"></div>
+    </div>
+
     <script>
         const firebaseConfig = { databaseURL: "https://yuanexchange-2fe09-default-rtdb.europe-west1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
@@ -145,8 +145,8 @@
         let currentAdminLang = 'ky';
 
         const adminTranslations = {
-            ky: { title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", reviews: "Пикирлер", services: "Услугалар", users: "Колдонуучулар", promoLabel: "Жарнама блогундагы курс:", promoTextLabel: "Жарнама тексти", updateBtn: "КУРСТАРДЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок", confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!", pos: "😻 Жагымдуу", neg: "😾 Нааразы" },
-            ru: { title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", reviews: "Отзывы", services: "Услуги", users: "Пользователи", promoLabel: "Курс в блоке рекламы:", promoTextLabel: "Текст рекламы", updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет", confirm: "Вы уверены?", success: "Успешно обновлено!", pos: "😻 Положительный", neg: "😾 Отрицательный" }
+            ky: { title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", reviews: "Пикирлер", services: "Услугалар", users: "Колдонуучулар", promotions: "Акциялар", updateBtn: "КУРСТАРДЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок", confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!" },
+            ru: { title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", reviews: "Отзывы", services: "Услуги", users: "Пользователи", promotions: "Акции", updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет", confirm: "Вы уверены?", success: "Успешно обновлено!" }
         };
 
         function switchAdminLang(lang) {
@@ -160,6 +160,7 @@
             document.getElementById('nav-reviews').innerText = t.reviews;
             document.getElementById('nav-services').innerText = t.services;
             document.getElementById('nav-users').innerText = t.users;
+            document.getElementById('nav-promotions').innerText = t.promotions;
             document.getElementById('lbl-stat-orders').innerText = t.orders;
             document.getElementById('lbl-stat-reviews').innerText = t.reviews;
             document.getElementById('h2-rates').innerHTML = `<i class="fas fa-chart-line"></i> ${t.rates}`;
@@ -168,8 +169,6 @@
             document.getElementById('h2-reviews').innerHTML = `<i class="fas fa-comment-dots"></i> ${t.reviews}`;
             document.getElementById('h2-services').innerHTML = `<i class="fas fa-cogs"></i> ${t.services}`;
             document.getElementById('h2-users').innerHTML = `<i class="fas fa-users"></i> ${t.users}`;
-            document.getElementById('lbl-promo-rates').innerText = t.promoLabel;
-            document.getElementById('lbl-promo-text').innerText = t.promoTextLabel;
             document.getElementById('btn-update-rates').innerText = t.updateBtn;
             document.getElementById('btn-save-bank').innerText = t.saveBtn;
             document.getElementById('adm-ky').classList.toggle('active', lang === 'ky');
@@ -180,13 +179,14 @@
         if (localStorage.getItem('adminDarkMode') === 'true') document.body.classList.add('dark');
 
         function showSection(sectionId) {
-            const sections = ['section-rates', 'section-bank', 'section-orders', 'section-reviews', 'section-services', 'section-users'];
+            const sections = ['section-rates', 'section-bank', 'section-orders', 'section-reviews', 'section-services', 'section-users', 'section-promotions'];
             sections.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = id === sectionId ? 'block' : 'none';
             });
         }
 
+        // Курстарды жүктөө
         db.ref('exchangeSettings').on('value', (s) => {
             if(s.exists()){
                 const d = s.val();
@@ -196,13 +196,7 @@
                 document.getElementById('we-t1').value = d.we?.t1 || '';
                 document.getElementById('we-t2').value = d.we?.t2 || '';
                 document.getElementById('we-t3').value = d.we?.t3 || '';
-                document.getElementById('promo-text').value = d.promo || '';
                 document.getElementById('channel-link').value = d.channelLink || '';
-                if(d.promoRates) {
-                    document.getElementById('promo-rate-1').value = d.promoRates.r1 || "";
-                    document.getElementById('promo-rate-2').value = d.promoRates.r2 || "";
-                    document.getElementById('promo-rate-3').value = d.promoRates.r3 || "";
-                }
                 if(d.bank){
                     document.getElementById('bank-name').value = d.bank.name || "MBANK";
                     document.getElementById('bank-num').value = d.bank.number;
@@ -219,9 +213,7 @@
             const data = {
                 ali: { t1: parseFloat(document.getElementById('ali-t1').value), t2: parseFloat(document.getElementById('ali-t2').value), t3: parseFloat(document.getElementById('ali-t3').value) },
                 we: { t1: parseFloat(document.getElementById('we-t1').value), t2: parseFloat(document.getElementById('we-t2').value), t3: parseFloat(document.getElementById('we-t3').value) },
-                promo: document.getElementById('promo-text').value,
-                channelLink: document.getElementById('channel-link').value,
-                promoRates: { r1: document.getElementById('promo-rate-1').value, r2: document.getElementById('promo-rate-2').value, r3: document.getElementById('promo-rate-3').value }
+                channelLink: document.getElementById('channel-link').value
             };
             db.ref('exchangeSettings').update(data).then(() => alert(adminTranslations[currentAdminLang].success));
         }
@@ -241,6 +233,7 @@
             db.ref('exchangeSettings').update(updates).then(() => alert(adminTranslations[currentAdminLang].success));
         }
 
+        // Заказдар
         db.ref('orders').on('value', (s) => {
             const list = document.getElementById('orders-list');
             list.innerHTML = "";
@@ -252,18 +245,18 @@
             if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
         });
 
+        // Пикирлер
         db.ref('reviews').on('value', (s) => {
             const list = document.getElementById('reviews-list');
             list.innerHTML = ""; let count = 0;
             s.forEach(child => { count++; const r = child.val();
-                const typeClass = r.type === 'neg' ? 'type-neg' : 'type-pos';
-                const typeText = r.type === 'neg' ? adminTranslations[currentAdminLang].neg : adminTranslations[currentAdminLang].pos;
-                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i><div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span></div><div class="review-type ${typeClass}">${typeText}</div><div class="item-title">👤 ${r.name}</div><div style="font-size: 13px; margin-top: 5px;">${r.text}</div></div>` + list.innerHTML;
+                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i><div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span></div><div class="item-title">👤 ${r.name}</div><div style="font-size: 13px; margin-top: 5px;">${r.text}</div></div>` + list.innerHTML;
             });
             document.getElementById('stat-reviews').innerText = count;
             if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
         });
 
+        // Услугалар
         function loadServices() {
             db.ref('services').on('value', (s) => {
                 const list = document.getElementById('services-list');
@@ -276,6 +269,7 @@
             });
         }
 
+        // Колдонуучулар
         function loadUsers() {
             db.ref('users').on('value', (s) => {
                 const list = document.getElementById('users-list');
@@ -285,17 +279,67 @@
                     count++;
                     const u = child.val();
                     list.innerHTML += `
-                        <div class="user-card">
-                            <div class="user-info">
+                        <div class="user-card" style="background: var(--bg); padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
                                 <strong>${u.name} ${u.surname || ''}</strong><br>
-                                <small>${u.phone || ''}</small>
+                                <small>${u.phone || ''}</small><br>
+                                <span style="font-family: monospace; background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">🔑 ${u.code}</span>
                             </div>
-                            <div class="user-code-badge">🔑 ${u.code}</div>
-                            <i class="fas fa-trash-alt delete-user" onclick="deleteItem('users/${child.key}')"></i>
+                            <i class="fas fa-trash-alt delete-icon" style="position: static; cursor: pointer; color: var(--danger);" onclick="deleteItem('users/${child.key}')"></i>
                         </div>
                     `;
                 });
                 if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
+            });
+        }
+
+        // Акцияларды жүктөө жана башкаруу
+        function loadPromotions() {
+            db.ref('promotions').on('value', (s) => {
+                const list = document.getElementById('promotions-list');
+                list.innerHTML = "";
+                s.forEach(child => {
+                    const promo = child.val();
+                    list.innerHTML += `
+                        <div class="promo-item-admin">
+                            <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('promotions/${child.key}')"></i>
+                            <div style="font-weight: 800;">${promo.title || 'Аталышы жок'}</div>
+                            <div style="font-size: 13px; margin: 5px 0;">${promo.description || ''}</div>
+                            ${promo.code ? `<div style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-size: 11px;">Код: ${promo.code}</div>` : ''}
+                            ${promo.expiry ? `<div style="font-size: 11px; margin-top: 5px; color: var(--grey);">Аяктайт: ${new Date(promo.expiry).toLocaleString()}</div>` : ''}
+                        </div>
+                    `;
+                });
+                if(!s.exists()) list.innerHTML = `<p style='text-align:center; color:gray;'>Акциялар жок</p>`;
+            });
+        }
+
+        function addPromotion() {
+            const title = document.getElementById('promo-title').value.trim();
+            const description = document.getElementById('promo-desc').value.trim();
+            const code = document.getElementById('promo-code').value.trim();
+            const expiry = document.getElementById('promo-expiry').value;
+            
+            if (!title) {
+                alert("Акциянын аталышын жазыңыз!");
+                return;
+            }
+            
+            const promo = {
+                title: title,
+                description: description,
+                code: code,
+                createdAt: Date.now()
+            };
+            
+            if (expiry) promo.expiry = new Date(expiry).toISOString();
+            
+            db.ref('promotions').push(promo).then(() => {
+                alert(adminTranslations[currentAdminLang].success);
+                document.getElementById('promo-title').value = '';
+                document.getElementById('promo-desc').value = '';
+                document.getElementById('promo-code').value = '';
+                document.getElementById('promo-expiry').value = '';
             });
         }
 
@@ -310,14 +354,12 @@
         showSection('section-rates');
         loadServices();
         loadUsers();
+        loadPromotions();
         switchAdminLang('ky');
         
-        // Канал шилтемесин алдын ала орнотуу (эгер Firebase бош болсо)
         const defaultChannel = "https://t.me/alipei_2026";
         db.ref('exchangeSettings/channelLink').once('value', (snap) => {
-            if(!snap.exists()){
-                db.ref('exchangeSettings/channelLink').set(defaultChannel);
-            }
+            if(!snap.exists()) db.ref('exchangeSettings/channelLink').set(defaultChannel);
         });
     </script>
 </body>
