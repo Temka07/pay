@@ -19,22 +19,36 @@
         .card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         h2 { font-size: 17px; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
-        input, textarea { width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 16px; outline: none; background: var(--card-bg); color: var(--text); margin-bottom: 10px; }
-        input:focus, textarea:focus { border-color: var(--primary); }
+        input, textarea, select { width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; font-size: 16px; outline: none; background: var(--card-bg); color: var(--text); margin-bottom: 10px; }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); }
         button { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 15px; }
         .btn-save { background: var(--primary); color: white; }
         .btn-bank { background: var(--black); color: white; margin-top: 10px; }
+        .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
+        .btn-warning { background: #FF9500; color: white; }
         .list-container { max-height: 350px; overflow-y: auto; padding-right: 5px; }
         .item-card { background: var(--bg); padding: 15px; border-radius: 18px; margin-bottom: 10px; position: relative; border: 1px solid var(--border); }
         .item-meta { font-size: 11px; color: #8E8E93; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .item-title { font-weight: 800; font-size: 15px; }
         .delete-icon { position: absolute; right: 15px; top: 15px; color: #D1D1D6; font-size: 18px; cursor: pointer; }
         .delete-icon:hover { color: var(--danger); }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .stat-box { background: var(--card-bg); padding: 15px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
         .stat-num { font-size: 20px; font-weight: 900; color: var(--primary); }
-        .promo-item-admin { background: var(--bg); padding: 15px; border-radius: 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+        .promo-item-admin { background: var(--bg); padding: 15px; border-radius: 16px; margin-bottom: 12px; border-left: 4px solid var(--primary); position: relative; }
         .btn-small { width: auto; padding: 8px 16px; margin: 5px; background: var(--danger); color: white; border-radius: 12px; font-size: 12px; }
+        .lang-btns { display: flex; gap: 5px; background: var(--border); padding: 3px; border-radius: 12px; }
+        .lang-btns button { width: auto; padding: 6px 12px; background: transparent; color: var(--text); font-weight: 600; border-radius: 10px; margin: 0; }
+        .lang-btns button.active { background: var(--primary); color: white; }
+        .dark-mode-toggle { width: auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 30px; padding: 8px 12px; }
+        .service-edit { display: flex; gap: 8px; margin-top: 8px; }
+        .service-edit input { flex: 1; margin-bottom: 0; padding: 8px; font-size: 13px; }
+        .service-edit button { width: auto; padding: 8px 12px; font-size: 12px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .tab { padding: 8px 16px; border-radius: 20px; cursor: pointer; background: var(--bg); }
+        .tab.active { background: var(--primary); color: white; }
+        .flex-row { display: flex; gap: 10px; align-items: center; }
+        .flex-row button { width: auto; padding: 10px 15px; }
     </style>
 </head>
 <body>
@@ -54,17 +68,21 @@
         <a class="nav-link" onclick="showSection('section-rates')" id="nav-rates">Курстар</a>
         <a class="nav-link" onclick="showSection('section-bank')" id="nav-bank">Реквизиттер</a>
         <a class="nav-link" onclick="showSection('section-orders')" id="nav-orders">Заказдар</a>
-        <a class="nav-link" onclick="showSection('section-reviews')" id="nav-reviews">Отзывтар</a>
+        <a class="nav-link" onclick="showSection('section-reviews')" id="nav-reviews">Пикирлер</a>
         <a class="nav-link" onclick="showSection('section-services')" id="nav-services">Услугалар</a>
         <a class="nav-link" onclick="showSection('section-users')" id="nav-users">Колдонуучулар</a>
         <a class="nav-link" onclick="showSection('section-promotions')" id="nav-promotions">🏷️ Акциялар</a>
+        <a class="nav-link" onclick="showSection('section-settings')" id="nav-settings">⚙️ Орнотуулар</a>
     </div>
 
     <div class="stat-grid">
         <div class="stat-box"><div class="stat-num" id="stat-orders">0</div><div class="stat-label" id="lbl-stat-orders">Заказдар</div></div>
-        <div class="stat-box"><div class="stat-num" id="stat-reviews">0</div><div class="stat-label" id="lbl-stat-reviews">Отзывтар</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-reviews">0</div><div class="stat-label" id="lbl-stat-reviews">Пикирлер</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-users">0</div><div class="stat-label" id="lbl-stat-users">Колдонуучулар</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-services">0</div><div class="stat-label" id="lbl-stat-services">Услугалар</div></div>
     </div>
 
+    <!-- Курстар бөлүмү -->
     <div id="section-rates" class="card">
         <h2 id="h2-rates"><i class="fas fa-chart-line"></i> Юань курстары</h2>
         <label style="font-size: 12px; color: gray;">Alipay (T1, T2, T3)</label>
@@ -84,6 +102,7 @@
         <button id="btn-update-rates" class="btn-save" onclick="updateRates()" style="margin-top: 15px;">КУРСТАРДЫ ЖАҢЫРТУУ</button>
     </div>
 
+    <!-- Реквизиттер бөлүмү -->
     <div id="section-bank" class="card" style="display:none;">
         <h2 id="h2-bank"><i class="fas fa-university"></i> Реквизиттер</h2>
         <input type="text" id="bank-name" placeholder="Банк">
@@ -96,32 +115,61 @@
         <button id="btn-save-bank" class="btn-bank" onclick="updateBank()">САКТОО</button>
     </div>
 
+    <!-- Заказдар бөлүмү -->
     <div id="section-orders" class="card" style="display:none;">
         <h2 id="h2-orders"><i class="fas fa-shopping-cart"></i> Акыркы заказдар</h2>
+        <div class="flex-row" style="margin-bottom: 10px;">
+            <button onclick="loadOrders()" class="btn-small" style="background: var(--primary);">Жаңыртуу</button>
+            <button onclick="clearAllOrders()" class="btn-small" style="background: var(--danger);">Бардык заказдарды өчүрүү</button>
+        </div>
         <div id="orders-list" class="list-container"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
     </div>
 
+    <!-- Пикирлер бөлүмү -->
     <div id="section-reviews" class="card" style="display:none;">
         <h2 id="h2-reviews"><i class="fas fa-comment-dots"></i> Кардарлардын пикирлери</h2>
+        <div class="flex-row" style="margin-bottom: 10px;">
+            <button onclick="loadReviews()" class="btn-small" style="background: var(--primary);">Жаңыртуу</button>
+            <button onclick="clearAllReviews()" class="btn-small" style="background: var(--danger);">Бардык пикирлерди өчүрүү</button>
+        </div>
         <div id="reviews-list" class="list-container"><p style="text-align:center; color:gray;">Пикирлер жок...</p></div>
     </div>
 
+    <!-- Услугалар бөлүмү (толук башкаруу) -->
     <div id="section-services" class="card" style="display:none;">
         <h2 id="h2-services"><i class="fas fa-cogs"></i> Услугалар</h2>
         <div id="services-list" class="list-container"></div>
-        <div style="margin-top: 15px;">
+        <div style="margin-top: 15px; background: var(--bg); padding: 15px; border-radius: 16px;">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">➕ Жаңы услуга кошуу</h3>
             <input type="text" id="new-service-name" placeholder="Услуга аты">
             <input type="text" id="new-service-link" placeholder="Ссылка (URL)">
-            <button class="btn-save" onclick="addService()">➕ КОШУУ</button>
+            <div class="flex-row">
+                <select id="new-service-icon" style="flex: 1;">
+                    <option value="fas fa-link">🔗 Шилтеме</option>
+                    <option value="fab fa-alipay">💳 Alipay</option>
+                    <option value="fab fa-weixin">💬 WeChat</option>
+                    <option value="fab fa-telegram">📱 Telegram</option>
+                    <option value="fab fa-whatsapp">📞 WhatsApp</option>
+                    <option value="fas fa-chart-line">📊 Курс</option>
+                    <option value="fas fa-shopping-cart">🛒 Сатып алуу</option>
+                    <option value="fas fa-gift">🎁 Акция</option>
+                </select>
+                <button class="btn-save" onclick="addService()" style="width: auto; padding: 14px 20px;">➕ КОШУУ</button>
+            </div>
         </div>
     </div>
 
+    <!-- Колдонуучулар бөлүмү -->
     <div id="section-users" class="card" style="display:none;">
         <h2 id="h2-users"><i class="fas fa-users"></i> Колдонуучулар</h2>
-        <div id="users-list" class="users-list"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
+        <div class="flex-row" style="margin-bottom: 10px;">
+            <button onclick="loadUsers()" class="btn-small" style="background: var(--primary);">Жаңыртуу</button>
+            <button onclick="clearAllUsers()" class="btn-small" style="background: var(--danger);">Бардык колдонуучуларды өчүрүү</button>
+        </div>
+        <div id="users-list" class="list-container"><p style="text-align:center; color:gray;">Жүктөлүүдө...</p></div>
     </div>
 
-    <!-- ЖАҢЫ: Акцияларды башкаруу бөлүмү -->
+    <!-- Акцияларды башкаруу бөлүмү -->
     <div id="section-promotions" class="card" style="display:none;">
         <h2><i class="fas fa-tags"></i> Акцияларды башкаруу</h2>
         
@@ -131,11 +179,47 @@
             <textarea id="promo-desc" placeholder="Акциянын сүрөттөмөсү..." rows="2"></textarea>
             <input type="text" id="promo-code" placeholder="Промокод (мис: AUTUMN10)">
             <input type="datetime-local" id="promo-expiry" placeholder="Акциянын аяктаган убактысы">
+            <div class="flex-row">
+                <select id="promo-type" style="flex: 1;">
+                    <option value="discount">💰 Пайыздык арзандатуу</option>
+                    <option value="fixed">🏷️ Белгиленген сумма</option>
+                    <option value="bonus">🎁 Бонус</option>
+                </select>
+                <input type="text" id="promo-value" placeholder="Маани (мис: 10% же 500с)" style="flex: 1;">
+            </div>
             <button class="btn-save" onclick="addPromotion()" style="margin-top: 5px;">➕ Акция кошуу</button>
         </div>
         
         <h3 style="font-size: 14px; margin-bottom: 10px;">📋 Учурдагы акциялар</h3>
         <div id="promotions-list" class="list-container"></div>
+    </div>
+
+    <!-- Орнотуулар бөлүмү -->
+    <div id="section-settings" class="card" style="display:none;">
+        <h2><i class="fas fa-sliders-h"></i> Орнотуулар</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">📱 Колдоо байланыштары</h3>
+            <input type="text" id="settings-wa" placeholder="WhatsApp номер">
+            <input type="text" id="settings-tg" placeholder="Telegram логин">
+            <input type="text" id="settings-email" placeholder="Email (милдеттүү эмес)">
+            <button class="btn-save" onclick="updateSupportSettings()">САКТОО</button>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🎨 Сайттын көрүнүшү</h3>
+            <label>Негизги түс</label>
+            <input type="color" id="primary-color" value="#5856D6">
+            <label>Фон түсү (ачык режим)</label>
+            <input type="color" id="bg-color" value="#F2F2F7">
+            <button class="btn-save" onclick="updateThemeSettings()">ТҮСТӨРДҮ САКТОО</button>
+        </div>
+        
+        <div>
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🗑️ Маалыматтарды башкаруу</h3>
+            <button class="btn-warning" onclick="exportData()">📥 Маалыматтарды экспорттоо (JSON)</button>
+            <button class="btn-danger" onclick="clearAllData()" style="margin-top: 10px;">⚠️ БАРДЫК МААЛЫМАТТАРДЫ ӨЧҮРҮҮ</button>
+        </div>
     </div>
 
     <script>
@@ -145,8 +229,8 @@
         let currentAdminLang = 'ky';
 
         const adminTranslations = {
-            ky: { title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", reviews: "Пикирлер", services: "Услугалар", users: "Колдонуучулар", promotions: "Акциялар", updateBtn: "КУРСТАРДЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок", confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!" },
-            ru: { title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", reviews: "Отзывы", services: "Услуги", users: "Пользователи", promotions: "Акции", updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет", confirm: "Вы уверены?", success: "Успешно обновлено!" }
+            ky: { title: "Башкаруу панели", toSite: "Сайтка", rates: "Курстар", bank: "Реквизиттер", orders: "Заказдар", reviews: "Пикирлер", services: "Услугалар", users: "Колдонуучулар", promotions: "Акциялар", settings: "Орнотуулар", updateBtn: "КУРСТАРДЫ ЖАҢЫРТУУ", saveBtn: "САКТОО", loading: "Жүктөлүүдө...", noData: "Маалымат жок", confirm: "Чын эле өчүрөсүзбү?", success: "Ийгиликтүү аткарылды!" },
+            ru: { title: "Панель управления", toSite: "На сайт", rates: "Курсы", bank: "Реквизиты", orders: "Заказы", reviews: "Отзывы", services: "Услуги", users: "Пользователи", promotions: "Акции", settings: "Настройки", updateBtn: "ОБНОВИТЬ КУРСЫ", saveBtn: "СОХРАНИТЬ", loading: "Загрузка...", noData: "Данных нет", confirm: "Вы уверены?", success: "Успешно обновлено!" }
         };
 
         function switchAdminLang(lang) {
@@ -161,8 +245,11 @@
             document.getElementById('nav-services').innerText = t.services;
             document.getElementById('nav-users').innerText = t.users;
             document.getElementById('nav-promotions').innerText = t.promotions;
+            document.getElementById('nav-settings').innerText = t.settings;
             document.getElementById('lbl-stat-orders').innerText = t.orders;
             document.getElementById('lbl-stat-reviews').innerText = t.reviews;
+            document.getElementById('lbl-stat-users').innerText = "Колдонуучулар";
+            document.getElementById('lbl-stat-services').innerText = "Услугалар";
             document.getElementById('h2-rates').innerHTML = `<i class="fas fa-chart-line"></i> ${t.rates}`;
             document.getElementById('h2-bank').innerHTML = `<i class="fas fa-university"></i> ${t.bank}`;
             document.getElementById('h2-orders').innerHTML = `<i class="fas fa-shopping-cart"></i> ${t.orders}`;
@@ -179,7 +266,7 @@
         if (localStorage.getItem('adminDarkMode') === 'true') document.body.classList.add('dark');
 
         function showSection(sectionId) {
-            const sections = ['section-rates', 'section-bank', 'section-orders', 'section-reviews', 'section-services', 'section-users', 'section-promotions'];
+            const sections = ['section-rates', 'section-bank', 'section-orders', 'section-reviews', 'section-services', 'section-users', 'section-promotions', 'section-settings'];
             sections.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = id === sectionId ? 'block' : 'none';
@@ -205,6 +292,18 @@
                 if(d.support){
                     document.getElementById('support-wa').value = d.support.whatsapp || '';
                     document.getElementById('support-tg').value = d.support.telegram || '';
+                }
+                // Орнотуулар бөлүмү үчүн
+                if(d.support){
+                    document.getElementById('settings-wa').value = d.support.whatsapp || '';
+                    document.getElementById('settings-tg').value = d.support.telegram || '';
+                }
+                if(d.email){
+                    document.getElementById('settings-email').value = d.email || '';
+                }
+                if(d.theme){
+                    document.getElementById('primary-color').value = d.theme.primary || '#5856D6';
+                    document.getElementById('bg-color').value = d.theme.bg || '#F2F2F7';
                 }
             }
         });
@@ -233,45 +332,132 @@
             db.ref('exchangeSettings').update(updates).then(() => alert(adminTranslations[currentAdminLang].success));
         }
 
+        function updateSupportSettings() {
+            const updates = {
+                support: {
+                    whatsapp: document.getElementById('settings-wa').value,
+                    telegram: document.getElementById('settings-tg').value,
+                    email: document.getElementById('settings-email').value
+                }
+            };
+            db.ref('exchangeSettings').update(updates).then(() => alert(adminTranslations[currentAdminLang].success));
+        }
+
+        function updateThemeSettings() {
+            const updates = {
+                theme: {
+                    primary: document.getElementById('primary-color').value,
+                    bg: document.getElementById('bg-color').value
+                }
+            };
+            db.ref('exchangeSettings').update(updates).then(() => alert(adminTranslations[currentAdminLang].success));
+        }
+
         // Заказдар
-        db.ref('orders').on('value', (s) => {
-            const list = document.getElementById('orders-list');
-            list.innerHTML = "";
-            let count = 0;
-            s.forEach(child => { count++; const o = child.val();
-                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('orders/${child.key}')"></i><div class="item-meta"><span>${o.date}</span> <span>${o.app}</span></div><div class="item-title">${o.amountSom} сом → ${o.amountYuan} ¥</div></div>` + list.innerHTML;
+        function loadOrders() {
+            db.ref('orders').once('value', (s) => {
+                const list = document.getElementById('orders-list');
+                list.innerHTML = "";
+                let count = 0;
+                s.forEach(child => { count++; const o = child.val();
+                    list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('orders/${child.key}')"></i><div class="item-meta"><span>${new Date(o.date).toLocaleString()}</span> <span>${o.app}</span></div><div class="item-title">${o.amountSom} сом → ${o.amountYuan} ¥</div><div style="font-size: 11px; color: gray;">👤 ${o.userName || 'Аноним'} ${o.userSurname || ''}</div><div style="font-size: 11px;">🔑 Код: ${o.userCode || 'жок'}</div></div>` + list.innerHTML;
+                });
+                document.getElementById('stat-orders').innerText = count;
+                if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
             });
-            document.getElementById('stat-orders').innerText = count;
-            if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
-        });
+        }
+
+        function clearAllOrders() {
+            if(confirm(adminTranslations[currentAdminLang].confirm + " Бардык заказдар өчүрүлөт!")){
+                db.ref('orders').remove().then(() => { loadOrders(); alert("Бардык заказдар өчүрүлдү!"); });
+            }
+        }
 
         // Пикирлер
-        db.ref('reviews').on('value', (s) => {
-            const list = document.getElementById('reviews-list');
-            list.innerHTML = ""; let count = 0;
-            s.forEach(child => { count++; const r = child.val();
-                list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i><div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span></div><div class="item-title">👤 ${r.name}</div><div style="font-size: 13px; margin-top: 5px;">${r.text}</div></div>` + list.innerHTML;
+        function loadReviews() {
+            db.ref('reviews').once('value', (s) => {
+                const list = document.getElementById('reviews-list');
+                list.innerHTML = ""; let count = 0;
+                s.forEach(child => { count++; const r = child.val();
+                    list.innerHTML = `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('reviews/${child.key}')"></i><div class="item-meta"><span>${r.date ? new Date(r.date).toLocaleDateString() : ''}</span><span>${r.type === 'pos' ? '😻' : '😾'}</span></div><div class="item-title">👤 ${r.name}</div><div style="font-size: 13px; margin-top: 5px;">${r.text}</div></div>` + list.innerHTML;
+                });
+                document.getElementById('stat-reviews').innerText = count;
+                if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
             });
-            document.getElementById('stat-reviews').innerText = count;
-            if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
-        });
+        }
+
+        function clearAllReviews() {
+            if(confirm(adminTranslations[currentAdminLang].confirm + " Бардык пикирлер өчүрүлөт!")){
+                db.ref('reviews').remove().then(() => { loadReviews(); alert("Бардык пикирлер өчүрүлдү!"); });
+            }
+        }
 
         // Услугалар
         function loadServices() {
             db.ref('services').on('value', (s) => {
                 const list = document.getElementById('services-list');
                 list.innerHTML = "";
+                let count = 0;
                 s.forEach(child => {
+                    count++;
                     const svc = child.val();
-                    list.innerHTML += `<div class="item-card"><i class="fas fa-trash-alt delete-icon" onclick="deleteItem('services/${child.key}')"></i><div class="item-title">${svc.name}</div><a href="${svc.link}" target="_blank" style="font-size:12px; color:var(--primary);">${svc.link}</a></div>`;
+                    const iconClass = svc.icon || 'fas fa-link';
+                    list.innerHTML += `
+                        <div class="item-card" id="service-${child.key}">
+                            <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('services/${child.key}')"></i>
+                            <div class="item-title"><i class="${iconClass}"></i> ${svc.name}</div>
+                            <a href="${svc.link}" target="_blank" style="font-size:12px; color:var(--primary);">${svc.link}</a>
+                            <div class="service-edit">
+                                <input type="text" id="edit-name-${child.key}" value="${escapeHtml(svc.name)}" placeholder="Аты">
+                                <input type="text" id="edit-link-${child.key}" value="${escapeHtml(svc.link)}" placeholder="URL">
+                                <button onclick="updateService('${child.key}')" class="btn-small" style="background: var(--primary);">💾</button>
+                            </div>
+                        </div>
+                    `;
                 });
-                if(!s.exists()) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
+                document.getElementById('stat-services').innerText = count;
+                if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
             });
+        }
+
+        function escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function updateService(serviceId) {
+            const newName = document.getElementById(`edit-name-${serviceId}`).value;
+            const newLink = document.getElementById(`edit-link-${serviceId}`).value;
+            if(newName && newLink){
+                db.ref(`services/${serviceId}`).update({ name: newName, link: newLink }).then(() => {
+                    alert(adminTranslations[currentAdminLang].success);
+                });
+            }
+        }
+
+        function addService() {
+            const name = document.getElementById('new-service-name').value.trim();
+            const link = document.getElementById('new-service-link').value.trim();
+            const icon = document.getElementById('new-service-icon').value;
+            if(name && link) {
+                db.ref('services').push({ name, link, icon }).then(() => { 
+                    document.getElementById('new-service-name').value = ''; 
+                    document.getElementById('new-service-link').value = '';
+                    alert(adminTranslations[currentAdminLang].success);
+                });
+            } else {
+                alert("Услуганын атын жана шилтемесин жазыңыз!");
+            }
         }
 
         // Колдонуучулар
         function loadUsers() {
-            db.ref('users').on('value', (s) => {
+            db.ref('users').once('value', (s) => {
                 const list = document.getElementById('users-list');
                 list.innerHTML = "";
                 let count = 0;
@@ -279,34 +465,45 @@
                     count++;
                     const u = child.val();
                     list.innerHTML += `
-                        <div class="user-card" style="background: var(--bg); padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong>${u.name} ${u.surname || ''}</strong><br>
-                                <small>${u.phone || ''}</small><br>
-                                <span style="font-family: monospace; background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">🔑 ${u.code}</span>
-                            </div>
-                            <i class="fas fa-trash-alt delete-icon" style="position: static; cursor: pointer; color: var(--danger);" onclick="deleteItem('users/${child.key}')"></i>
+                        <div class="item-card">
+                            <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('users/${child.key}')"></i>
+                            <div class="item-title"><strong>${u.name} ${u.surname || ''}</strong></div>
+                            <div class="item-meta">📱 ${u.phone || 'жок'}</div>
+                            <div><span style="background: var(--primary); color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px;">🔑 ${u.code}</span></div>
+                            <div style="font-size: 11px; margin-top: 5px;">📅 ${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : ''}</div>
                         </div>
                     `;
                 });
+                document.getElementById('stat-users').innerText = count;
                 if(count === 0) list.innerHTML = `<p style='text-align:center; color:gray;'>${adminTranslations[currentAdminLang].noData}</p>`;
             });
         }
 
-        // Акцияларды жүктөө жана башкаруу
+        function clearAllUsers() {
+            if(confirm(adminTranslations[currentAdminLang].confirm + " Бардык колдонуучулар өчүрүлөт!")){
+                db.ref('users').remove().then(() => { loadUsers(); alert("Бардык колдонуучулар өчүрүлдү!"); });
+            }
+        }
+
+        // Акциялар
         function loadPromotions() {
             db.ref('promotions').on('value', (s) => {
                 const list = document.getElementById('promotions-list');
                 list.innerHTML = "";
                 s.forEach(child => {
                     const promo = child.val();
+                    const expiryDate = promo.expiry ? new Date(promo.expiry).toLocaleString() : 'Чексиз';
+                    const typeText = promo.type === 'discount' ? '💰 Пайыз' : (promo.type === 'fixed' ? '🏷️ Фикс' : '🎁 Бонус');
                     list.innerHTML += `
                         <div class="promo-item-admin">
                             <i class="fas fa-trash-alt delete-icon" onclick="deleteItem('promotions/${child.key}')"></i>
                             <div style="font-weight: 800;">${promo.title || 'Аталышы жок'}</div>
                             <div style="font-size: 13px; margin: 5px 0;">${promo.description || ''}</div>
-                            ${promo.code ? `<div style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; display: inline-block; font-size: 11px;">Код: ${promo.code}</div>` : ''}
-                            ${promo.expiry ? `<div style="font-size: 11px; margin-top: 5px; color: var(--grey);">Аяктайт: ${new Date(promo.expiry).toLocaleString()}</div>` : ''}
+                            <div class="flex-row" style="gap: 8px; flex-wrap: wrap;">
+                                ${promo.code ? `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">Код: ${promo.code}</span>` : ''}
+                                ${promo.value ? `<span style="background: var(--success); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">${typeText}: ${promo.value}</span>` : ''}
+                                <span style="font-size: 11px;">⏰ ${expiryDate}</span>
+                            </div>
                         </div>
                     `;
                 });
@@ -319,6 +516,8 @@
             const description = document.getElementById('promo-desc').value.trim();
             const code = document.getElementById('promo-code').value.trim();
             const expiry = document.getElementById('promo-expiry').value;
+            const type = document.getElementById('promo-type').value;
+            const value = document.getElementById('promo-value').value.trim();
             
             if (!title) {
                 alert("Акциянын аталышын жазыңыз!");
@@ -329,6 +528,8 @@
                 title: title,
                 description: description,
                 code: code,
+                type: type,
+                value: value,
                 createdAt: Date.now()
             };
             
@@ -340,22 +541,82 @@
                 document.getElementById('promo-desc').value = '';
                 document.getElementById('promo-code').value = '';
                 document.getElementById('promo-expiry').value = '';
+                document.getElementById('promo-value').value = '';
             });
         }
 
-        function addService() {
-            const name = document.getElementById('new-service-name').value;
-            const link = document.getElementById('new-service-link').value;
-            if(name && link) db.ref('services').push({ name, link }).then(() => { document.getElementById('new-service-name').value = ''; document.getElementById('new-service-link').value = ''; alert(adminTranslations[currentAdminLang].success); });
+        function deleteItem(path) { 
+            if(confirm(adminTranslations[currentAdminLang].confirm)) 
+                db.ref(path).remove(); 
         }
 
-        function deleteItem(path) { if(confirm(adminTranslations[currentAdminLang].confirm)) db.ref(path).remove(); }
+        // Экспорт
+        function exportData() {
+            const exports = {};
+            Promise.all([
+                db.ref('orders').once('value'),
+                db.ref('reviews').once('value'),
+                db.ref('users').once('value'),
+                db.ref('services').once('value'),
+                db.ref('promotions').once('value'),
+                db.ref('exchangeSettings').once('value')
+            ]).then(([orders, reviews, users, services, promotions, settings]) => {
+                exports.orders = orders.val() || {};
+                exports.reviews = reviews.val() || {};
+                exports.users = users.val() || {};
+                exports.services = services.val() || {};
+                exports.promotions = promotions.val() || {};
+                exports.settings = settings.val() || {};
+                
+                const dataStr = JSON.stringify(exports, null, 2);
+                const blob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `yuan_backup_${new Date().toISOString().slice(0,19)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert("Маалыматтар экспорттолду!");
+            });
+        }
 
+        function clearAllData() {
+            if(confirm("БАРДЫК МААЛЫМАТТАР өчүрүлөт! Бул аракетти кайтаруу мүмкүн эмес. Улантасызбы?")){
+                if(confirm("АКЫРКЫ ЖООЛУ: Чын эле бардык маалыматтарды өчүрөсүзбү?")){
+                    Promise.all([
+                        db.ref('orders').remove(),
+                        db.ref('reviews').remove(),
+                        db.ref('users').remove(),
+                        db.ref('services').remove(),
+                        db.ref('promotions').remove()
+                    ]).then(() => {
+                        alert("Бардык маалыматтар өчүрүлдү!");
+                        loadOrders();
+                        loadReviews();
+                        loadUsers();
+                        loadServices();
+                        loadPromotions();
+                    });
+                }
+            }
+        }
+
+        // Баштапкы жүктөө
         showSection('section-rates');
         loadServices();
         loadUsers();
         loadPromotions();
+        loadOrders();
+        loadReviews();
         switchAdminLang('ky');
+        
+        // Статистиканы жаңыртуу
+        setInterval(() => {
+            db.ref('orders').once('value', s => document.getElementById('stat-orders').innerText = s.numChildren());
+            db.ref('reviews').once('value', s => document.getElementById('stat-reviews').innerText = s.numChildren());
+            db.ref('users').once('value', s => document.getElementById('stat-users').innerText = s.numChildren());
+            db.ref('services').once('value', s => document.getElementById('stat-services').innerText = s.numChildren());
+        }, 5000);
         
         const defaultChannel = "https://t.me/alipei_2026";
         db.ref('exchangeSettings/channelLink').once('value', (snap) => {

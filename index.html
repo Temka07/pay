@@ -29,7 +29,9 @@
     <!-- Главная страница -->
     <div id="page-home" class="page active">
         <div id="welcome-block" class="welcome-card" onclick="handleWelcomeClick()"></div>
-        <div class="promo-section" id="promo-display">...</div>
+        
+        <!-- Акция блогу (курс көрсөтүлбөйт) -->
+        <div id="promo-display" class="promo-section" style="display: none;"></div>
         
         <div class="glass-card rate-card">
             <div id="txt-today-rate" class="rate-header">🇨🇳 Юаньдын бүгүнкү курсу:</div>
@@ -99,18 +101,27 @@
         <button class="main-submit-btn" onclick="sendOrder()" id="btn-main">АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ</button>
     </div>
 
-    <!-- Нускама страницасы -->
+    <!-- Нускама страницасы (толук иштетилген) -->
     <div id="page-guide" class="page">
         <h2 id="guide-title">Кантип сатып алуу керек?</h2>
         <div class="glass-card guide-content">
-            <div class="guide-step"><div class="num-b">1</div><p id="g-step-1"></p></div>
-            <div class="guide-step"><div class="num-b">2</div><p id="g-step-2"></p></div>
-            <div class="guide-step"><div class="num-b">3</div><p id="g-step-3"></p></div>
+            <div class="guide-step">
+                <div class="num-b">1</div>
+                <p id="g-step-1">Керектүү сумманы жазыңыз. Курс автоматтык түрдө эсептелип чыгат.</p>
+            </div>
+            <div class="guide-step">
+                <div class="num-b">2</div>
+                <p id="g-step-2">Эсептөөдөн кийин реквизиттерди көчүрүп, өзүңүздүн банктык тиркемеңиз аркылуу которуу жасаңыз.</p>
+            </div>
+            <div class="guide-step">
+                <div class="num-b">3</div>
+                <p id="g-step-3">Которуу аяктагандан кийин «АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ» баскычын басыңыз. WhatsApp аркылуу төлөмдүн чегин жөнөтүңүз.</p>
+            </div>
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-1">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- Курс страницасы (Alipay жана Pinduoduo курс шилтемелери менен) -->
+    <!-- Курс страницасы -->
     <div id="page-course" class="page">
         <h2 id="course-title">Курстар</h2>
         <div class="glass-card">
@@ -167,11 +178,10 @@
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- Услугалар страницасы -->
+    <!-- Услугалар страницасы (iframe аркылуу өзүнчө файл) -->
     <div id="page-services" class="page">
-        <h2 id="services-title">Услугалар</h2>
-        <div id="services-container" class="glass-card service-buttons"></div>
-        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+        <iframe src="services.html" style="width: 100%; height: 80vh; border: none; border-radius: 24px; background: transparent;"></iframe>
+        <button class="main-submit-btn back-btn" onclick="showPage('page-home')" style="margin-top: 15px;">АРТКА КАЙТУУ</button>
     </div>
 
     <!-- Пикирлер страницасы -->
@@ -191,7 +201,7 @@
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-2">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- ЖАҢЫ: Менин заказдарым страницасы -->
+    <!-- Менин заказдарым страницасы -->
     <div id="page-my-orders" class="page">
         <h2 id="my-orders-title">Менин заказдарым</h2>
         <div id="my-orders-list" class="glass-card" style="max-height: 500px; overflow-y: auto;">
@@ -199,26 +209,9 @@
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
     </div>
-
-    <!-- ЖАҢЫ: Жардам бөлүмү -->
-    <div id="page-help" class="page">
-        <h2 id="help-title">Жардам</h2>
-        <div class="glass-card">
-            <div class="help-item" style="margin-bottom: 15px;">
-                <h3 style="font-size: 16px; margin-bottom: 8px;">📞 Байланыш</h3>
-                <p>WhatsApp: <a href="https://wa.me/996990032007" style="color: var(--primary);">+996 990 032 007</a></p>
-                <p>Telegram: <a href="https://t.me/Temka007z" style="color: var(--primary);">@Temka007z</a></p>
-            </div>
-            <div class="help-item">
-                <h3 style="font-size: 16px; margin-bottom: 8px;">⏰ Иштөө убактысы</h3>
-                <p>Күнүнө 24 саат, дем алыш күндөрү да иштейбиз</p>
-            </div>
-        </div>
-        <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
-    </div>
 </div>
 
-<!-- Сайдбар меню (жаңы бөлүмдөр кошулду) -->
+<!-- Сайдбар меню -->
 <div id="side-menu" class="side-menu">
     <div class="menu-close" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
     <div id="menu-user-info"></div>
@@ -231,14 +224,13 @@
         <a href="#" onclick="showPage('page-channel'); toggleMenu()" class="menu-link" id="m-channel">📢 Канал</a>
         <a href="#" onclick="showPage('page-services'); toggleMenu()" class="menu-link" id="m-services">⚙️ Услугалар</a>
         <a href="#" onclick="showPage('page-reviews'); toggleMenu()" class="menu-link" id="m-reviews">⭐ Пикирлер</a>
-        <a href="#" onclick="showPage('page-help'); toggleMenu()" class="menu-link" id="m-help">🆘 Жардам</a>
         <div class="menu-divider" id="m-div-auth">Аккаунт</div>
         <a href="#" onclick="logout()" class="menu-link" id="m-logout">🚪 Чыгуу</a>
     </div>
 </div>
 <div id="menu-overlay" onclick="toggleMenu()"></div>
 
-<!-- Auth Modal (регистрация/кирүү) -->
+<!-- Auth Modal -->
 <div id="auth-modal" class="auth-modal" style="display: none;">
     <div class="auth-card">
         <div class="auth-header">
@@ -246,7 +238,6 @@
             <div class="auth-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></div>
         </div>
         <div id="auth-forms">
-            <!-- Регистрация формасы -->
             <div id="register-form" class="auth-form">
                 <div class="input-group">
                     <i class="fas fa-user"></i>
@@ -263,7 +254,6 @@
                 <button class="auth-btn" onclick="register()" id="reg-btn">Катталуу</button>
                 <span class="switch-auth" onclick="toggleAuthForm()" id="switch-to-login">Кодуңуз бар? Кирүү</span>
             </div>
-            <!-- Кирүү формасы -->
             <div id="login-form" class="auth-form" style="display:none;">
                 <div class="input-group">
                     <i class="fas fa-key"></i>
@@ -291,7 +281,7 @@ const ADMIN_CODE = "197907";
 // Менин заказдарымды жүктөө
 function loadMyOrders() {
     if (!currentUser) {
-        alert("Заказдарыңызды көрүү үчүн кириңиз!");
+        alert(translations[currentLang]?.alert_fill || "Заказдарыңызды көрүү үчүн кириңиз!");
         showPage('page-home');
         return;
     }
@@ -321,6 +311,7 @@ function loadMyOrders() {
             const div = document.createElement('div');
             div.className = 'item-card';
             div.style.marginBottom = '12px';
+            div.style.background = 'var(--bg)';
             div.innerHTML = `
                 <div class="item-meta">${date} | ${order.app}</div>
                 <div class="item-title">${order.amountSom} сом → ${order.amountYuan} ¥</div>
@@ -331,7 +322,7 @@ function loadMyOrders() {
     });
 }
 
-// Админ кирүү функциясын жаңыртуу
+// Админ кирүү функциясы
 window.originalLogin = login;
 window.login = function() {
     const code = document.getElementById('login-code')?.value.trim();
@@ -343,7 +334,7 @@ window.login = function() {
     originalLogin();
 }
 
-// Welcome блокту 5 жолу басуу (админ кирүү)
+// Welcome блокту 5 жолу басуу
 const adminWelcomeBlock = document.getElementById('welcome-block');
 if (adminWelcomeBlock) {
     let adminTapCount = 0;
@@ -365,37 +356,40 @@ if (adminWelcomeBlock) {
     });
 }
 
-// Тил которууда жаңы бөлүмдөрдүн тилин жаңыртуу
+// Тил которуу
 const originalSwitchLang = switchLang;
 window.switchLang = function(lang) {
     originalSwitchLang(lang);
     const t = translations[lang];
     
-    // Жаңы бөлүмдөрдүн тилдери
     const myOrdersTitle = document.getElementById('my-orders-title');
     if (myOrdersTitle) myOrdersTitle.innerText = t.my_orders || "Менин заказдарым";
-    
-    const helpTitle = document.getElementById('help-title');
-    if (helpTitle) helpTitle.innerText = t.help || "Жардам";
     
     const mMyOrders = document.getElementById('m-my-orders');
     if (mMyOrders) mMyOrders.innerHTML = t.m_my_orders || "📦 Менин заказдарым";
     
-    const mHelp = document.getElementById('m-help');
-    if (mHelp) mHelp.innerHTML = t.m_help || "🆘 Жардам";
+    // Нускама тексттерин жаңыртуу
+    const g1 = document.getElementById('g-step-1');
+    const g2 = document.getElementById('g-step-2');
+    const g3 = document.getElementById('g-step-3');
+    if(g1) g1.innerText = t.g1;
+    if(g2) g2.innerText = t.g2;
+    if(g3) g3.innerText = t.g3;
 }
 
 // translations.js ге кошумча
 if (!translations.ky.my_orders) {
     translations.ky.my_orders = "Менин заказдарым";
-    translations.ky.help = "Жардам";
     translations.ky.m_my_orders = "📦 Менин заказдарым";
-    translations.ky.m_help = "🆘 Жардам";
+    translations.ky.g1 = "Керектүү сумманы жазыңыз. Курс автоматтык түрдө эсептелип чыгат.";
+    translations.ky.g2 = "Эсептөөдөн кийин реквизиттерди көчүрүп, өзүңүздүн банктык тиркемеңиз аркылуу которуу жасаңыз.";
+    translations.ky.g3 = "Которуу аяктагандан кийин «АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ» баскычын басыңыз. WhatsApp аркылуу төлөмдүн чегин жөнөтүңүз.";
     
     translations.ru.my_orders = "Мои заказы";
-    translations.ru.help = "Помощь";
     translations.ru.m_my_orders = "📦 Мои заказы";
-    translations.ru.m_help = "🆘 Помощь";
+    translations.ru.g1 = "Введите нужную сумму. Курс рассчитается автоматически.";
+    translations.ru.g2 = "После расчета скопируйте реквизиты и сделайте перевод через свой банк.";
+    translations.ru.g3 = "После оплаты нажмите кнопку «ОБМЕНЯТЬ И ОТПРАВИТЬ ЧЕК». Отправьте чек в WhatsApp.";
 }
 
 console.log("%c🔒 Админ коду: 197907", "color: #5856D6; font-size: 14px; font-weight: bold;");

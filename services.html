@@ -1,0 +1,169 @@
+ <!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Услугалар</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+        .services-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 5px;
+        }
+        .service-card {
+            background: var(--card-bg, white);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--text, #1C1C1E);
+            border: 1px solid var(--border, #E5E5EA);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .service-card:active {
+            transform: scale(0.98);
+            background: var(--bg, #F2F2F7);
+        }
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary, #5856D6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        .service-info {
+            flex: 1;
+        }
+        .service-name {
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .service-link {
+            font-size: 12px;
+            color: var(--grey, #8E8E93);
+            word-break: break-all;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--grey, #8E8E93);
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background: transparent; }
+        }
+        body.dark {
+            --card-bg: #1C1C1E;
+            --text: #FFFFFF;
+            --border: #2C2C2E;
+            --bg: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div id="services-list" class="services-container">
+        <div class="empty-state">⏳ Жүктөлүүдө...</div>
+    </div>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://yuanexchange-2fe09-default-rtdb.europe-west1.firebasedatabase.app/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Dark mode ата-энеден алуу
+        function checkParentDarkMode() {
+            try {
+                if (window.parent.document.body.classList.contains('dark')) {
+                    document.body.classList.add('dark');
+                }
+            } catch(e) {}
+        }
+        checkParentDarkMode();
+
+        // Услугаларды жүктөө
+        function loadServices() {
+            const container = document.getElementById('services-list');
+            
+            db.ref('services').on('value', (snap) => {
+                container.innerHTML = '';
+                
+                if (!snap.exists()) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Услугалар жок</div>';
+                    return;
+                }
+                
+                let hasServices = false;
+                snap.forEach(child => {
+                    hasServices = true;
+                    const svc = child.val();
+                    const serviceId = child.key;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'service-card';
+                    div.onclick = () => {
+                        if (svc.link) {
+                            window.open(svc.link, '_blank');
+                        }
+                    };
+                    
+                    // Иконканы атына карап тандоо
+                    let iconClass = 'fas fa-link';
+                    if (svc.name.toLowerCase().includes('alipay')) iconClass = 'fab fa-alipay';
+                    else if (svc.name.toLowerCase().includes('wechat')) iconClass = 'fab fa-weixin';
+                    else if (svc.name.toLowerCase().includes('telegram')) iconClass = 'fab fa-telegram';
+                    else if (svc.name.toLowerCase().includes('whatsapp')) iconClass = 'fab fa-whatsapp';
+                    else if (svc.name.toLowerCase().includes('курс')) iconClass = 'fas fa-chart-line';
+                    
+                    div.innerHTML = `
+                        <div class="service-icon"><i class="${iconClass}"></i></div>
+                        <div class="service-info">
+                            <div class="service-name">${escapeHtml(svc.name)}</div>
+                            <div class="service-link">${escapeHtml(svc.link || '')}</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--grey);"></i>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                if (!hasServices) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Услугалар жок</div>';
+                }
+            });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        loadServices();
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@ function initDOM() {
     weBtn = document.getElementById('we-btn');
 }
 
-// Курс алуу (тандалган app боюнча)
+// Курс алуу
 function getCurrentRate() {
     const amount = parseFloat(somInput?.value) || 0;
     const rates = settings;
@@ -49,7 +49,6 @@ function calculate(source) {
     }
 }
 
-// Быстрое значение
 function setVal(type, val) {
     if (type === 'som' && somInput) {
         somInput.value = val;
@@ -65,7 +64,6 @@ function focusInput(id) {
     if (el) el.focus();
 }
 
-// Приложение тандоо
 function setApp(app) {
     currentApp = app;
     if (aliBtn && weBtn) {
@@ -80,7 +78,6 @@ function setApp(app) {
     calculate('som');
 }
 
-// Көчүрүү
 function copyNum() {
     const bankNum = settings.bank?.number || '';
     if (bankNum) {
@@ -90,14 +87,9 @@ function copyNum() {
             toast.style.display = 'flex';
             setTimeout(() => { toast.style.display = 'none'; }, 1500);
         }
-        const t = translations[currentLang];
-        if (t && t.copy_success) {
-            // Optional: show message
-        }
     }
 }
 
-// Заказ жөнөтүү
 function sendOrder() {
     const t = translations[currentLang];
     const amountSom = parseFloat(somInput?.value) || 0;
@@ -116,6 +108,7 @@ function sendOrder() {
     const order = {
         userId: currentUser.id,
         userName: currentUser.name,
+        userSurname: currentUser.surname || '',
         amountSom: amountSom,
         amountYuan: amountYuan,
         app: currentApp,
@@ -125,53 +118,41 @@ function sendOrder() {
     
     db.ref('orders').push(order)
         .then(() => {
-            // WhatsApp аркылуу чек жөнөтүү
             const whatsappNumber = settings.support?.whatsapp || '996990032007';
-            const message = `Заказ №${Date.now()}\nСумма: ${amountSom} сом = ${amountYuan} ¥\nПриложение: ${currentApp}\nКод: ${currentUser.code}`;
+            const message = `Заказ №${Date.now()}\nСумма: ${amountSom} сом = ${amountYuan} ¥\nПриложение: ${currentApp}\nКод: ${currentUser.code}\nИмя: ${currentUser.name} ${currentUser.surname || ''}`;
             window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
         })
         .catch(err => console.error('Order error:', err));
 }
 
-// UI жаңыртуу (курстар, банк маалыматтары)
+// UI жаңыртуу (акция блогу жок)
 function updateUI() {
     db.ref('exchangeSettings').on('value', (snap) => {
         if (snap.exists()) {
             const data = snap.val();
             settings.ali = data.ali || settings.ali;
             settings.we = data.we || settings.we;
-            settings.promo = data.promo || settings.promo;
-            settings.promoRates = data.promoRates || settings.promoRates;
             settings.bank = data.bank || settings.bank;
             settings.channelLink = data.channelLink || settings.channelLink;
             settings.support = data.support || settings.support;
             
-            // Промо блокту жаңыртуу
+            // Акция блогу жок, promoDisplay жашырылды
             if (promoDisplay) {
-                const t = translations[currentLang];
-                promoDisplay.innerHTML = `
-                    <div style="font-weight:800; margin-bottom:5px;">🏆 100ю чейин: ${settings.promoRates?.r1 || '--'} KGS</div>
-                    <div style="font-weight:800; margin-bottom:5px;">💰 100ю — 3000ю: ${settings.promoRates?.r2 || '--'} KGS</div>
-                    <div style="font-weight:800;">⚡ 3000ю жогору: ${settings.promoRates?.r3 || '--'} KGS</div>
-                    <div style="margin-top:8px; font-size:13px;">${settings.promo}</div>
-                `;
+                promoDisplay.style.display = 'none';
             }
             
-            // Банк карточкасын жаңыртуу
             const bankNameSpan = document.querySelector('.bank-name');
             const bankNumberStrong = document.getElementById('bank-number');
             if (bankNameSpan) bankNameSpan.innerText = settings.bank?.name || 'MBANK';
             if (bankNumberStrong) bankNumberStrong.innerText = settings.bank?.number || '0998 792 579';
             
-            // Курстарды жаңыртуу
             const rate1 = document.getElementById('p-rate-1');
             const rate2 = document.getElementById('p-rate-2');
             const rate3 = document.getElementById('p-rate-3');
-            if (rate1) rate1.innerText = settings.promoRates?.r1 || '--';
-            if (rate2) rate2.innerText = settings.promoRates?.r2 || '--';
-            if (rate3) rate3.innerText = settings.promoRates?.r3 || '--';
+            if (rate1) rate1.innerText = data.promoRates?.r1 || '--';
+            if (rate2) rate2.innerText = data.promoRates?.r2 || '--';
+            if (rate3) rate3.innerText = data.promoRates?.r3 || '--';
             
-            // Эсептөөнү кайра жүргүзүү
             calculate('som');
         }
     });
@@ -196,7 +177,6 @@ function loadReviews() {
             reviews.push({ id: child.key, ...child.val() });
         });
         
-        // Акыркыларды биринчи көрсөтүү
         reviews.reverse().forEach(rev => {
             const typeIcon = rev.type === 'neg' ? '😾' : '😻';
             
@@ -215,7 +195,6 @@ function loadReviews() {
     });
 }
 
-// Пикир жөнөтүү
 function submitReview() {
     const t = translations[currentLang];
     const name = document.getElementById('rev-name')?.value.trim();
@@ -257,32 +236,11 @@ function setRevType(type) {
     }
 }
 
-// Услугаларды жүктөө
+// Услугалар - эми өзүнчө файлда, бул жерде бош
 function loadServices() {
-    const container = document.getElementById('services-container');
-    if (!container) return;
-    
-    db.ref('services').on('value', (snap) => {
-        container.innerHTML = '';
-        
-        if (!snap.exists()) {
-            container.innerHTML = '<div class="glass-card" style="text-align:center;">Услугалар жок</div>';
-            return;
-        }
-        
-        snap.forEach(child => {
-            const svc = child.val();
-            const a = document.createElement('a');
-            a.href = svc.link;
-            a.target = '_blank';
-            a.className = 'service-btn';
-            a.innerHTML = `<i class="fas fa-link"></i> ${svc.name}`;
-            container.appendChild(a);
-        });
-    });
+    // services.html аркылуу иштейт
 }
 
-// Колдоо шилтемелерин жүктөө
 function loadSupportLinks() {
     const container = document.getElementById('support-links');
     if (!container) return;
@@ -310,9 +268,6 @@ function loadChannelLink() {
         db.ref('exchangeSettings/channelLink').on('value', (snap) => {
             if (snap.exists()) {
                 channelLinkElem.href = snap.val();
-            } else {
-                // Default channel link
-                channelLinkElem.href = "https://t.me/alipei_2026";
             }
         });
     }
@@ -320,7 +275,7 @@ function loadChannelLink() {
 
 // Страницаларды көрсөтүү
 function showPage(pageId) {
-    const pages = ['page-home', 'page-guide', 'page-course', 'page-support', 'page-channel', 'page-services', 'page-reviews'];
+    const pages = ['page-home', 'page-guide', 'page-course', 'page-support', 'page-channel', 'page-services', 'page-reviews', 'page-my-orders'];
     pages.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('active');
@@ -355,7 +310,6 @@ function goBack() {
     }
 }
 
-// Меню
 function toggleMenu(forceClose) {
     const menu = document.getElementById('side-menu');
     const overlay = document.getElementById('menu-overlay');
@@ -373,14 +327,12 @@ function toggleMenu(forceClose) {
     }
 }
 
-// Тил которуу
 function switchLang(lang) {
     currentLang = lang;
     localStorage.setItem('lang', lang);
     
     const t = translations[lang];
     
-    // Баскычтардын активдүүлүгү
     const kyBtn = document.getElementById('btn-ky');
     const ruBtn = document.getElementById('btn-ru');
     if (kyBtn && ruBtn) {
@@ -393,7 +345,6 @@ function switchLang(lang) {
         }
     }
     
-    // Статикалык элементтерди жаңыртуу
     const elements = {
         'step-1': t.s1, 'step-2': t.s2, 'step-3': t.s3,
         'lbl-send': t.send, 'lbl-receive': t.receive,
@@ -419,51 +370,38 @@ function switchLang(lang) {
         if (el) el.innerText = text;
     }
     
-    // Пикир тил баскычтары
     const posBtn = document.getElementById('type-pos');
     const negBtn = document.getElementById('type-neg');
     if (posBtn) posBtn.innerHTML = t.pos;
     if (negBtn) negBtn.innerHTML = t.neg;
     
     updateUserInterface();
-    
-    // Промо блокту жаңыртуу
-    if (promoDisplay && settings.promoRates) {
-        promoDisplay.innerHTML = `
-            <div style="font-weight:800; margin-bottom:5px;">🏆 ${t.r1}: ${settings.promoRates?.r1 || '--'} KGS</div>
-            <div style="font-weight:800; margin-bottom:5px;">💰 ${t.r2}: ${settings.promoRates?.r2 || '--'} KGS</div>
-            <div style="font-weight:800;">⚡ ${t.r3}: ${settings.promoRates?.r3 || '--'} KGS</div>
-            <div style="margin-top:8px; font-size:13px;">${settings.promo}</div>
-        `;
-    }
 }
 
 function toggleDarkMode() {
     document.body.classList.toggle('dark');
     localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    // services.html ичиндеги dark mode синхронизациясы
+    try {
+        const iframe = document.querySelector('iframe');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ darkMode: document.body.classList.contains('dark') }, '*');
+        }
+    } catch(e) {}
 }
 
-// Initialize on page load
+// Initialize
 window.onload = () => {
     console.log('App starting...');
     
     initDOM();
     
-    // Firebase байланышын текшерүү
     db.ref('.info/connected').on('value', (snap) => {
-        if (snap.val() === true) {
-            console.log('Firebase connected!');
-        } else {
-            console.log('Firebase disconnected!');
-        }
+        if (snap.val() === true) console.log('Firebase connected!');
     });
     
-    // Dark mode
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-    }
+    if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
     
-    // Language
     const savedLang = localStorage.getItem('lang');
     if (savedLang && (savedLang === 'ky' || savedLang === 'ru')) {
         switchLang(savedLang);
@@ -471,24 +409,15 @@ window.onload = () => {
         switchLang('ky');
     }
     
-    // Auth check
     checkAuth();
-    
-    // Load data
     updateUI();
     loadReviews();
-    loadServices();
     loadSupportLinks();
     loadChannelLink();
     
-    // Admin trigger
     const welcomeBlock = document.getElementById('welcome-block');
-    if (welcomeBlock) {
-        welcomeBlock.onclick = handleWelcomeClick;
-    }
+    if (welcomeBlock) welcomeBlock.onclick = handleWelcomeClick;
     
-    // Курстарды баштапкы эсептөө
     setTimeout(() => calculate('som'), 100);
-    
     console.log('App started successfully!');
 };
