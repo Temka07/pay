@@ -1,4 +1,20 @@
- // DOM Elements
+ // ============ КООПСУЗДУК: XSS коргонуу ============
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function sanitizeText(str, maxLength = 500) {
+    if (!str) return '';
+    return escapeHtml(str).slice(0, maxLength);
+}
+
+// DOM Elements
 let somInput, yuanInput, currentRateSpan, rateInfoSpan, promoDisplay;
 let aliBtn, weBtn;
 
@@ -107,8 +123,8 @@ function sendOrder() {
     
     const order = {
         userId: currentUser.id,
-        userName: currentUser.name,
-        userSurname: currentUser.surname || '',
+        userName: sanitizeText(currentUser.name, 100),
+        userSurname: sanitizeText(currentUser.surname || '', 100),
         amountSom: amountSom,
         amountYuan: amountYuan,
         app: currentApp,
@@ -125,7 +141,7 @@ function sendOrder() {
         .catch(err => console.error('Order error:', err));
 }
 
-// UI жаңыртуу (акция блогу жок)
+// UI жаңыртуу
 function updateUI() {
     db.ref('exchangeSettings').on('value', (snap) => {
         if (snap.exists()) {
@@ -136,7 +152,7 @@ function updateUI() {
             settings.channelLink = data.channelLink || settings.channelLink;
             settings.support = data.support || settings.support;
             
-            // Акция блогу жок, promoDisplay жашырылды
+            // Акция блогу жашырылды (башкы бетте көрүнбөйт)
             if (promoDisplay) {
                 promoDisplay.style.display = 'none';
             }
@@ -158,7 +174,7 @@ function updateUI() {
     });
 }
 
-// Пикирлерди жүктөө
+// Пикирлерди жүктөө (коопсуз экранирование менен)
 function loadReviews() {
     const container = document.getElementById('reviews-container');
     if (!container) return;
@@ -168,7 +184,7 @@ function loadReviews() {
         container.innerHTML = '';
         
         if (!snap.exists()) {
-            container.innerHTML = `<div class="glass-card" style="text-align:center;">${t.no_rev}</div>`;
+            container.innerHTML = `<div class="glass-card" style="text-align:center;">${escapeHtml(t.no_rev)}</div>`;
             return;
         }
         
@@ -179,22 +195,22 @@ function loadReviews() {
         
         reviews.reverse().forEach(rev => {
             const typeIcon = rev.type === 'neg' ? '😾' : '😻';
-            
             const div = document.createElement('div');
             div.className = 'review-card';
             div.style.borderLeftColor = rev.type === 'neg' ? 'var(--danger)' : 'var(--success)';
             div.innerHTML = `
                 <div class="rev-header">
-                    <span><strong>${rev.name || 'Аноним'}</strong> ${typeIcon}</span>
+                    <span><strong>${sanitizeText(rev.name || 'Аноним', 50)}</strong> ${typeIcon}</span>
                     <span class="rev-date">${rev.date ? new Date(rev.date).toLocaleDateString() : ''}</span>
                 </div>
-                <div class="rev-body">${rev.text || ''}</div>
+                <div class="rev-body">${sanitizeText(rev.text || '', 500)}</div>
             `;
             container.appendChild(div);
         });
     });
 }
 
+// Пикир жөнөтүү (санитизация менен)
 function submitReview() {
     const t = translations[currentLang];
     const name = document.getElementById('rev-name')?.value.trim();
@@ -205,9 +221,19 @@ function submitReview() {
         return;
     }
     
+    // Узундукту текшерүү
+    if (name.length > 50) {
+        alert("Атыңыз 50 символдон ашпоого тийиш!");
+        return;
+    }
+    if (text.length > 500) {
+        alert("Пикириңиз 500 символдон ашпоого тийиш!");
+        return;
+    }
+    
     const review = {
-        name: name,
-        text: text,
+        name: sanitizeText(name, 50),
+        text: sanitizeText(text, 500),
         type: selectedRevType,
         date: Date.now()
     };
@@ -215,8 +241,10 @@ function submitReview() {
     db.ref('reviews').push(review)
         .then(() => {
             alert(t.alert_rev_ok);
-            if (document.getElementById('rev-name')) document.getElementById('rev-name').value = '';
-            if (document.getElementById('rev-text')) document.getElementById('rev-text').value = '';
+            const nameInput = document.getElementById('rev-name');
+            const textInput = document.getElementById('rev-text');
+            if (nameInput) nameInput.value = '';
+            if (textInput) textInput.value = '';
         })
         .catch(err => console.error('Review error:', err));
 }
@@ -236,11 +264,6 @@ function setRevType(type) {
     }
 }
 
-// Услугалар - эми өзүнчө файлда, бул жерде бош
-function loadServices() {
-    // services.html аркылуу иштейт
-}
-
 function loadSupportLinks() {
     const container = document.getElementById('support-links');
     if (!container) return;
@@ -250,13 +273,13 @@ function loadSupportLinks() {
         const support = data?.support || { whatsapp: '996990032007', telegram: 'Temka007z' };
         
         container.innerHTML = `
-            <a href="https://wa.me/${support.whatsapp}" target="_blank" class="support-item">
+            <a href="https://wa.me/${escapeHtml(support.whatsapp)}" target="_blank" class="support-item">
                 <i class="fab fa-whatsapp" style="font-size:24px; color:#25D366;"></i>
-                <div><strong>WhatsApp</strong><small>${support.whatsapp}</small></div>
+                <div><strong>WhatsApp</strong><small>${escapeHtml(support.whatsapp)}</small></div>
             </a>
-            <a href="https://t.me/${support.telegram.replace('@', '')}" target="_blank" class="support-item">
+            <a href="https://t.me/${escapeHtml(support.telegram.replace('@', ''))}" target="_blank" class="support-item">
                 <i class="fab fa-telegram" style="font-size:24px; color:#26A5E4;"></i>
-                <div><strong>Telegram</strong><small>@${support.telegram.replace('@', '')}</small></div>
+                <div><strong>Telegram</strong><small>@${escapeHtml(support.telegram.replace('@', ''))}</small></div>
             </a>
         `;
     });
@@ -381,7 +404,6 @@ function switchLang(lang) {
 function toggleDarkMode() {
     document.body.classList.toggle('dark');
     localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-    // services.html ичиндеги dark mode синхронизациясы
     try {
         const iframe = document.querySelector('iframe');
         if (iframe && iframe.contentWindow) {

@@ -22,7 +22,7 @@
                 <button id="btn-ky" class="active" onclick="switchLang('ky')">KG</button>
                 <button id="btn-ru" onclick="switchLang('ru')">RU</button>
             </div>
-            <button class="dark-mode-toggle" onclick="toggleDarkMode()" id="dark-mode-toggle">🌙</button>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
         </div>
     </div>
 
@@ -30,8 +30,10 @@
     <div id="page-home" class="page active">
         <div id="welcome-block" class="welcome-card" onclick="handleWelcomeClick()"></div>
         
-        <!-- Акция блогу (курс көрсөтүлбөйт) -->
-        <div id="promo-display" class="promo-section" style="display: none;"></div>
+        <!-- АКЦИЯ БЛОГУ (башкы бетте көрүнөт, курстардын үстүндө) -->
+        <div id="promo-banner" class="promo-section" style="display: none; cursor: pointer;" onclick="showPromotionsModal()">
+            <i class="fas fa-gift"></i> <span id="promo-banner-text">Акцияларды көрүү</span>
+        </div>
         
         <div class="glass-card rate-card">
             <div id="txt-today-rate" class="rate-header">🇨🇳 Юаньдын бүгүнкү курсу:</div>
@@ -101,22 +103,13 @@
         <button class="main-submit-btn" onclick="sendOrder()" id="btn-main">АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ</button>
     </div>
 
-    <!-- Нускама страницасы (толук иштетилген) -->
+    <!-- Нускама страницасы -->
     <div id="page-guide" class="page">
         <h2 id="guide-title">Кантип сатып алуу керек?</h2>
         <div class="glass-card guide-content">
-            <div class="guide-step">
-                <div class="num-b">1</div>
-                <p id="g-step-1">Керектүү сумманы жазыңыз. Курс автоматтык түрдө эсептелип чыгат.</p>
-            </div>
-            <div class="guide-step">
-                <div class="num-b">2</div>
-                <p id="g-step-2">Эсептөөдөн кийин реквизиттерди көчүрүп, өзүңүздүн банктык тиркемеңиз аркылуу которуу жасаңыз.</p>
-            </div>
-            <div class="guide-step">
-                <div class="num-b">3</div>
-                <p id="g-step-3">Которуу аяктагандан кийин «АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ» баскычын басыңыз. WhatsApp аркылуу төлөмдүн чегин жөнөтүңүз.</p>
-            </div>
+            <div class="guide-step"><div class="num-b">1</div><p id="g-step-1"></p></div>
+            <div class="guide-step"><div class="num-b">2</div><p id="g-step-2"></p></div>
+            <div class="guide-step"><div class="num-b">3</div><p id="g-step-3"></p></div>
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-1">АРТКА КАЙТУУ</button>
     </div>
@@ -137,7 +130,7 @@
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- Поддержка страницасы -->
+    <!-- Колдоо страницасы -->
     <div id="page-support" class="page">
         <h2 id="support-title">Колдоо</h2>
         <div class="glass-card">
@@ -178,7 +171,7 @@
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- Услугалар страницасы (iframe аркылуу өзүнчө файл) -->
+    <!-- Услугалар страницасы -->
     <div id="page-services" class="page">
         <iframe src="services.html" style="width: 100%; height: 80vh; border: none; border-radius: 24px; background: transparent;"></iframe>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" style="margin-top: 15px;">АРТКА КАЙТУУ</button>
@@ -190,12 +183,12 @@
         <div id="reviews-container" class="reviews-scroll"></div>
         <div class="glass-card add-review">
             <h3 id="add-rev-title">Пикир калтыруу</h3>
-            <input type="text" id="rev-name" placeholder="Атыңыз">
+            <input type="text" id="rev-name" placeholder="Атыңыз" maxlength="50">
             <div class="rev-type-btns">
                 <button id="type-pos" onclick="setRevType('pos')" class="rev-btn pos">😻 Жагымдуу</button>
                 <button id="type-neg" onclick="setRevType('neg')" class="rev-btn neg">😾 Нааразы</button>
             </div>
-            <textarea id="rev-text" placeholder="Оюңузду билдириңиз..." rows="3"></textarea>
+            <textarea id="rev-text" placeholder="Оюңузду билдириңиз..." rows="3" maxlength="500"></textarea>
             <button id="btn-submit-rev" class="main-submit-btn" onclick="submitReview()">ЖӨНӨТҮҮ</button>
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" id="btn-back-2">АРТКА КАЙТУУ</button>
@@ -208,6 +201,19 @@
             <p style="text-align: center; color: gray;">Заказдар жок</p>
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
+    </div>
+</div>
+
+<!-- Акциялар модалдык терезеси -->
+<div id="promotions-modal" class="auth-modal" style="display: none;">
+    <div class="auth-card" style="max-width: 400px;">
+        <div class="auth-header">
+            <h3><i class="fas fa-tags"></i> <span id="promo-modal-title">Акциялар</span></h3>
+            <div class="auth-close" onclick="closePromotionsModal()"><i class="fas fa-times"></i></div>
+        </div>
+        <div id="promotions-modal-list" style="max-height: 400px; overflow-y: auto;">
+            <p style="text-align: center;">Жүктөлүүдө...</p>
+        </div>
     </div>
 </div>
 
@@ -241,15 +247,15 @@
             <div id="register-form" class="auth-form">
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="reg-name" placeholder="Атыңыз">
+                    <input type="text" id="reg-name" placeholder="Атыңыз" maxlength="50">
                 </div>
                 <div class="input-group">
                     <i class="fas fa-user-tag"></i>
-                    <input type="text" id="reg-surname" placeholder="Фамилияңыз">
+                    <input type="text" id="reg-surname" placeholder="Фамилияңыз" maxlength="50">
                 </div>
                 <div class="input-group">
                     <i class="fab fa-whatsapp"></i>
-                    <input type="tel" id="reg-phone" placeholder="WhatsApp номер (996XXXYYZZ)">
+                    <input type="tel" id="reg-phone" placeholder="WhatsApp номер (996XXXYYZZ)" maxlength="20">
                 </div>
                 <button class="auth-btn" onclick="register()" id="reg-btn">Катталуу</button>
                 <span class="switch-auth" onclick="toggleAuthForm()" id="switch-to-login">Кодуңуз бар? Кирүү</span>
@@ -275,10 +281,99 @@
 <script>
 // ============ ЖАҢЫ ФУНКЦИЯЛАР ============
 
-// Админ коду
 const ADMIN_CODE = "197907";
 
-// Менин заказдарымды жүктөө
+// Акцияларды жүктөө жана башкы бетте көрсөтүү
+function loadPromotionsForHome() {
+    db.ref('promotions').on('value', (snap) => {
+        const banner = document.getElementById('promo-banner');
+        if (!banner) return;
+        
+        if (snap.exists()) {
+            let activeCount = 0;
+            const now = new Date();
+            snap.forEach(child => {
+                const promo = child.val();
+                if (promo.expiry) {
+                    const expiryDate = new Date(promo.expiry);
+                    if (expiryDate > now) activeCount++;
+                } else {
+                    activeCount++;
+                }
+            });
+            
+            if (activeCount > 0) {
+                banner.style.display = 'block';
+                const bannerText = document.getElementById('promo-banner-text');
+                if (bannerText) bannerText.innerText = `🎁 ${activeCount} акция бар!`;
+            } else {
+                banner.style.display = 'none';
+            }
+        } else {
+            banner.style.display = 'none';
+        }
+    });
+}
+
+// Акциялар модалдык терезесин ачуу
+function showPromotionsModal() {
+    const modal = document.getElementById('promotions-modal');
+    const listContainer = document.getElementById('promotions-modal-list');
+    if (!modal || !listContainer) return;
+    
+    listContainer.innerHTML = '<p style="text-align: center;">Жүктөлүүдө...</p>';
+    modal.style.display = 'flex';
+    
+    db.ref('promotions').once('value', (snap) => {
+        listContainer.innerHTML = '';
+        
+        if (!snap.exists()) {
+            listContainer.innerHTML = '<p style="text-align: center; color: gray;">Учурда акциялар жок</p>';
+            return;
+        }
+        
+        const now = new Date();
+        let hasActive = false;
+        
+        snap.forEach(child => {
+            const promo = child.val();
+            const expiryDate = promo.expiry ? new Date(promo.expiry) : null;
+            const isActive = !expiryDate || expiryDate > now;
+            
+            if (!isActive) return;
+            hasActive = true;
+            
+            const expiryText = expiryDate ? `⏰ Аяктайт: ${expiryDate.toLocaleString()}` : '⏰ Чексиз';
+            const typeText = promo.type === 'discount' ? '💰 Пайыз' : (promo.type === 'fixed' ? '🏷️ Фикс сумма' : '🎁 Бонус');
+            
+            const div = document.createElement('div');
+            div.className = 'promo-item-admin';
+            div.style.marginBottom = '12px';
+            div.style.padding = '15px';
+            div.innerHTML = `
+                <div style="font-weight: 800; font-size: 16px;">🎉 ${escapeHtml(promo.title || 'Аталышы жок')}</div>
+                <div style="font-size: 13px; margin: 8px 0;">${escapeHtml(promo.description || '')}</div>
+                <div class="flex-row" style="gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                    ${promo.code ? `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">🔑 Код: ${escapeHtml(promo.code)}</span>` : ''}
+                    ${promo.value ? `<span style="background: var(--success); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px;">${escapeHtml(typeText)}: ${escapeHtml(promo.value)}</span>` : ''}
+                    <span style="font-size: 11px; color: var(--grey);">${escapeHtml(expiryText)}</span>
+                </div>
+            `;
+            listContainer.appendChild(div);
+        });
+        
+        if (!hasActive) {
+            listContainer.innerHTML = '<p style="text-align: center; color: gray;">Учурда активдүү акциялар жок</p>';
+        }
+    });
+}
+
+function closePromotionsModal() {
+    const modal = document.getElementById('promotions-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Менин заказдарымды жүктөө (коопсуз)
 function loadMyOrders() {
     if (!currentUser) {
         alert(translations[currentLang]?.alert_fill || "Заказдарыңызды көрүү үчүн кириңиз!");
@@ -313,16 +408,16 @@ function loadMyOrders() {
             div.style.marginBottom = '12px';
             div.style.background = 'var(--bg)';
             div.innerHTML = `
-                <div class="item-meta">${date} | ${order.app}</div>
-                <div class="item-title">${order.amountSom} сом → ${order.amountYuan} ¥</div>
-                <div style="font-size: 12px; margin-top: 5px;">Статус: ${statusText}</div>
+                <div class="item-meta">${escapeHtml(date)} | ${escapeHtml(order.app)}</div>
+                <div class="item-title">${escapeHtml(order.amountSom)} сом → ${escapeHtml(order.amountYuan)} ¥</div>
+                <div style="font-size: 12px; margin-top: 5px;">Статус: ${escapeHtml(statusText)}</div>
             `;
             container.appendChild(div);
         });
     });
 }
 
-// Админ кирүү функциясы
+// Админ кирүү
 window.originalLogin = login;
 window.login = function() {
     const code = document.getElementById('login-code')?.value.trim();
@@ -368,30 +463,36 @@ window.switchLang = function(lang) {
     const mMyOrders = document.getElementById('m-my-orders');
     if (mMyOrders) mMyOrders.innerHTML = t.m_my_orders || "📦 Менин заказдарым";
     
-    // Нускама тексттерин жаңыртуу
     const g1 = document.getElementById('g-step-1');
     const g2 = document.getElementById('g-step-2');
     const g3 = document.getElementById('g-step-3');
     if(g1) g1.innerText = t.g1;
     if(g2) g2.innerText = t.g2;
     if(g3) g3.innerText = t.g3;
+    
+    const promoModalTitle = document.getElementById('promo-modal-title');
+    if (promoModalTitle) promoModalTitle.innerText = t.promotions_title || "Акциялар";
 }
 
 // translations.js ге кошумча
 if (!translations.ky.my_orders) {
     translations.ky.my_orders = "Менин заказдарым";
     translations.ky.m_my_orders = "📦 Менин заказдарым";
+    translations.ky.promotions_title = "Акциялар";
     translations.ky.g1 = "Керектүү сумманы жазыңыз. Курс автоматтык түрдө эсептелип чыгат.";
     translations.ky.g2 = "Эсептөөдөн кийин реквизиттерди көчүрүп, өзүңүздүн банктык тиркемеңиз аркылуу которуу жасаңыз.";
     translations.ky.g3 = "Которуу аяктагандан кийин «АЛМАШТЫРУУ ЖАНА ЧЕК ЖИБЕРҮҮ» баскычын басыңыз. WhatsApp аркылуу төлөмдүн чегин жөнөтүңүз.";
     
     translations.ru.my_orders = "Мои заказы";
     translations.ru.m_my_orders = "📦 Мои заказы";
+    translations.ru.promotions_title = "Акции";
     translations.ru.g1 = "Введите нужную сумму. Курс рассчитается автоматически.";
     translations.ru.g2 = "После расчета скопируйте реквизиты и сделайте перевод через свой банк.";
     translations.ru.g3 = "После оплаты нажмите кнопку «ОБМЕНЯТЬ И ОТПРАВИТЬ ЧЕК». Отправьте чек в WhatsApp.";
 }
 
+// Ишке киргизүү
+loadPromotionsForHome();
 console.log("%c🔒 Админ коду: 197907", "color: #5856D6; font-size: 14px; font-weight: bold;");
 </script>
 

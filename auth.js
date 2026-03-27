@@ -3,12 +3,22 @@
 // АДМИН КОДУ (6 орундуу, уникалдуу)
 const ADMIN_SECRET_CODE = "197907";
 
+// КООПСУЗДУК: XSS коргонуу
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function showAuthModal() {
     const t = translations[currentLang];
     const modal = document.getElementById('auth-modal');
     if (!modal) return;
     
-    // Формаларды тазалоо
     const regName = document.getElementById('reg-name');
     const regSurname = document.getElementById('reg-surname');
     const regPhone = document.getElementById('reg-phone');
@@ -21,7 +31,6 @@ function showAuthModal() {
     if (loginCode) loginCode.value = '';
     if (msgDiv) msgDiv.innerHTML = '';
     
-    // Регистрация формасын көрсөтүү
     const regForm = document.getElementById('register-form');
     const loginForm = document.getElementById('login-form');
     if (regForm) regForm.style.display = 'block';
@@ -52,12 +61,10 @@ function toggleAuthForm() {
     if (msgDiv) msgDiv.innerHTML = '';
 }
 
-// 4 орундуу колдонуучу коду (1000-9999)
 function generateUserCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
-// WhatsApp номерин текшерүү
 function validatePhone(phone) {
     const cleaned = phone.replace(/\D/g, '');
     return cleaned.length >= 8 && cleaned.length <= 15;
@@ -66,10 +73,10 @@ function validatePhone(phone) {
 function showAuthMessage(message, isError = true) {
     const msgDiv = document.getElementById('auth-message');
     if (msgDiv) {
-        msgDiv.innerHTML = message;
+        msgDiv.innerHTML = escapeHtml(message);
         msgDiv.className = 'auth-message ' + (isError ? 'error' : 'success');
         setTimeout(() => {
-            if (msgDiv.innerHTML === message) {
+            if (msgDiv.innerHTML === escapeHtml(message)) {
                 msgDiv.innerHTML = '';
             }
         }, 3000);
@@ -84,12 +91,15 @@ function register() {
     const surname = document.getElementById('reg-surname')?.value.trim();
     const phone = document.getElementById('reg-phone')?.value.trim();
     
-    console.log('Register attempt:', { name, surname, phone });
-    
     if (!name || !surname || !phone) {
         showAuthMessage(t.error_fill);
         return;
     }
+    
+    // Узундукту текшерүү
+    if (name.length > 50) { showAuthMessage("Атыңыз 50 символдон ашпоого тийиш!"); return; }
+    if (surname.length > 50) { showAuthMessage("Фамилияңыз 50 символдон ашпоого тийиш!"); return; }
+    if (phone.length > 20) { showAuthMessage("Телефон номери туура эмес!"); return; }
     
     if (!validatePhone(phone)) {
         showAuthMessage(t.error_phone);
@@ -100,22 +110,17 @@ function register() {
     const userId = Date.now().toString();
     
     const userData = {
-        name: name,
-        surname: surname,
-        phone: phone,
+        name: escapeHtml(name),
+        surname: escapeHtml(surname),
+        phone: phone.replace(/\D/g, ''),
         code: code,
         createdAt: Date.now()
     };
     
-    console.log('Saving user:', userData);
-    
-    // Firebaseге жазуу
     db.ref('users/' + userId).set(userData)
         .then(() => {
-            console.log('User saved successfully');
             showAuthMessage(t.reg_success + code, false);
             
-            // Автоматтык кирүү
             currentUser = { 
                 name: name, 
                 surname: surname, 
@@ -136,34 +141,27 @@ function register() {
         });
 }
 
-// ============ КИРҮҮ (АДМИН КОДУ МЕНЕН) ============
+// ============ КИРҮҮ ============
 function login() {
     const t = translations[currentLang];
     const code = document.getElementById('login-code')?.value.trim();
-    
-    console.log('Login attempt with code:', code);
     
     if (!code) {
         showAuthMessage(t.error_fill);
         return;
     }
     
-    // === АДМИН ТЕКШЕРҮҮ (6 орундуу атайын код) ===
+    // АДМИН ТЕКШЕРҮҮ
     if (code === ADMIN_SECRET_CODE) {
-        console.log('Admin login detected! Opening admin panel...');
-        // Админ панелин жаңы терезеде ачуу
         window.open('admin.html', '_blank');
         closeAuthModal();
         return;
     }
     
-    // === КАДИМКИ КОЛДОНУУЧУНУ ТЕКШЕРҮҮ (4 орундуу код) ===
-    // Эгер код 4 орундуу сан болсо, кадимки колдонуучуну изде
+    // КАДИМКИ КОЛДОНУУЧУ
     if (/^\d{4}$/.test(code)) {
         db.ref('users').orderByChild('code').equalTo(code).once('value')
             .then((snapshot) => {
-                console.log('User query result:', snapshot.exists());
-                
                 if (snapshot.exists()) {
                     let userData = null;
                     let userId = null;
@@ -198,7 +196,6 @@ function login() {
                 showAuthMessage('Кирүүдө ката: ' + error.message);
             });
     } else {
-        // Код туура эмес форматта (4 орундуу сан эмес, админ коду да эмес)
         showAuthMessage(t.login_failed);
     }
 }
@@ -224,39 +221,33 @@ function updateUserInterface() {
     const welcomeBlock = document.getElementById('welcome-block');
     const menuUserInfo = document.getElementById('menu-user-info');
     
-    console.log('Updating UI, currentUser:', currentUser);
-    
     if (currentUser) {
-        // Башкы беттеги welcome блок
         if (welcomeBlock) {
             welcomeBlock.innerHTML = `
-                <div class="welcome-name">👋 ${t.welcome_back} ${currentUser.name} ${currentUser.surname || ''}!</div>
-                <div class="welcome-code">🔑 ${t.enter_code}: <strong>${currentUser.code}</strong></div>
-                <div class="welcome-phone">📱 ${currentUser.phone || ''}</div>
+                <div class="welcome-name">👋 ${escapeHtml(t.welcome_back)} ${escapeHtml(currentUser.name)} ${escapeHtml(currentUser.surname || '')}!</div>
+                <div class="welcome-code">🔑 ${escapeHtml(t.enter_code)}: <strong>${escapeHtml(currentUser.code)}</strong></div>
+                <div class="welcome-phone">📱 ${escapeHtml(currentUser.phone || '')}</div>
             `;
             welcomeBlock.style.cursor = 'default';
         }
         
-        // Сайдбардагы колдонуучу маалыматы
         if (menuUserInfo) {
             menuUserInfo.innerHTML = `
-                <div class="menu-user-name">${currentUser.name} ${currentUser.surname || ''}</div>
-                <div class="menu-user-code">🔑 ${currentUser.code}</div>
-                <div class="menu-user-phone" style="font-size: 11px; opacity:0.7;">${currentUser.phone || ''}</div>
+                <div class="menu-user-name">${escapeHtml(currentUser.name)} ${escapeHtml(currentUser.surname || '')}</div>
+                <div class="menu-user-code">🔑 ${escapeHtml(currentUser.code)}</div>
+                <div class="menu-user-phone" style="font-size: 11px; opacity:0.7;">${escapeHtml(currentUser.phone || '')}</div>
             `;
         }
     } else {
         if (welcomeBlock) {
-            welcomeBlock.innerHTML = `
-                <div class="welcome-login">👋 ${t.login_register}</div>
-            `;
+            welcomeBlock.innerHTML = `<div class="welcome-login">👋 ${escapeHtml(t.login_register)}</div>`;
             welcomeBlock.style.cursor = 'pointer';
         }
         
         if (menuUserInfo) {
             menuUserInfo.innerHTML = `
-                <div class="menu-user-name">${t.welcome}</div>
-                <div class="menu-user-code" style="font-size: 12px;">${t.login_register}</div>
+                <div class="menu-user-name">${escapeHtml(t.welcome)}</div>
+                <div class="menu-user-code" style="font-size: 12px;">${escapeHtml(t.login_register)}</div>
             `;
         }
     }
@@ -267,7 +258,6 @@ function checkAuth() {
     if (savedUser) {
         try {
             currentUser = JSON.parse(savedUser);
-            console.log('Loaded user from localStorage:', currentUser);
         } catch (e) {
             console.error('Error parsing user data:', e);
             currentUser = null;
@@ -276,28 +266,6 @@ function checkAuth() {
     updateUserInterface();
 }
 
-// Тест үчүн демо колдонуучу түзүү (керек болсо)
-function createDemoUser() {
-    const demoCode = "1234";
-    const demoUser = {
-        name: "Тест",
-        surname: "Колдонуучу",
-        phone: "996700123456",
-        code: demoCode,
-        id: "demo123"
-    };
-    
-    // Firebaseге сактоо
-    db.ref('users/demo123').set(demoUser)
-        .then(() => {
-            console.log('Demo user created with code: 1234');
-            alert('Демо колдонуучу түзүлдү! Коду: 1234');
-        })
-        .catch(err => console.error('Error:', err));
-}
-
-// ============ АДМИН КИРҮҮ ҮЧҮН КОШУМЧА МЕХАНИЗМ ============
-// Бул функцияны консоль аркылуу да чакырууга болот
 function openAdminPanel() {
     const adminCode = prompt("Админ кодуңузду киргизиңиз:");
     if (adminCode === ADMIN_SECRET_CODE) {
@@ -307,6 +275,4 @@ function openAdminPanel() {
     }
 }
 
-// Консольго маалымат чыгаруу (админдер үчүн)
 console.log("%c🔒 Админ панелине кирүү үчүн код: " + ADMIN_SECRET_CODE, "color: #5856D6; font-size: 14px; font-weight: bold;");
-console.log("%c💡 openAdminPanel() функциясын чакырып да кирсеңиз болот", "color: #34C759; font-size: 12px;");
