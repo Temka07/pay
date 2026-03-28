@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Услугалар</title>
+    <title>Услугалар | Yuan Exchange</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,85 +13,307 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
+        :root {
+            --primary: #5856D6;
+            --primary-light: #7A79E2;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --bg: #F2F2F7;
+            --grey: #8E8E93;
+            --card-bg: white;
+            --text: #1C1C1E;
+            --border: #E5E5EA;
+        }
+        
+        body.dark {
+            --bg: #000000;
+            --card-bg: #1C1C1E;
+            --text: #FFFFFF;
+            --border: #2C2C2E;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: transparent;
-            padding: 0;
+            background: var(--bg);
+            padding: 20px;
             margin: 0;
+            color: var(--text);
+            transition: all 0.3s;
         }
+        
         .services-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding: 5px;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        .service-card {
-            background: var(--card-bg, white);
+        
+        /* Маркетинг карточкалары */
+        .marketing-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .marketing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #C692FF);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .marketing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        }
+        
+        .marketing-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .marketing-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), #C692FF);
             border-radius: 20px;
-            padding: 18px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            text-decoration: none;
-            color: var(--text, #1C1C1E);
-            border: 1px solid var(--border, #E5E5EA);
-            transition: all 0.2s;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .marketing-icon i {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .marketing-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        
+        .marketing-card p {
+            font-size: 14px;
+            color: var(--grey);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        
+        .marketing-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .marketing-list li {
+            font-size: 13px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .marketing-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .marketing-list li i {
+            width: 24px;
+            color: var(--primary);
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .marketing-btn {
+            background: var(--primary);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 40px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            display: inline-block;
+            width: 100%;
+            border: none;
             cursor: pointer;
         }
-        .service-card:active {
-            transform: scale(0.98);
-            background: var(--bg, #F2F2F7);
+        
+        .marketing-btn i {
+            margin-right: 8px;
         }
-        .service-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary, #5856D6);
+        
+        .marketing-card:hover .marketing-btn {
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--grey);
+        }
+        
+        /* Динамикалык услугалар бөлүмү */
+        .dynamic-services {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .dynamic-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+        
+        .service-item {
+            background: var(--bg);
             border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+        }
+        
+        .service-item:hover {
+            transform: translateX(5px);
+            background: var(--card-bg);
+        }
+        
+        .service-item-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
+            font-size: 20px;
         }
-        .service-info {
+        
+        .service-item-info {
             flex: 1;
         }
-        .service-name {
-            font-weight: 800;
-            font-size: 16px;
+        
+        .service-item-name {
+            font-weight: 700;
+            font-size: 15px;
             margin-bottom: 4px;
         }
-        .service-link {
-            font-size: 12px;
-            color: var(--grey, #8E8E93);
+        
+        .service-item-link {
+            font-size: 11px;
+            color: var(--grey);
             word-break: break-all;
         }
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--grey, #8E8E93);
-        }
-        @media (prefers-color-scheme: dark) {
-            body { background: transparent; }
-        }
-        body.dark {
-            --card-bg: #1C1C1E;
-            --text: #FFFFFF;
-            --border: #2C2C2E;
-            --bg: #000000;
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .marketing-card h3 {
+                font-size: 18px;
+            }
+            
+            .marketing-card p {
+                font-size: 13px;
+            }
+            
+            .marketing-list li {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="services-list" class="services-container">
-        <div class="empty-state">⏳ Жүктөлүүдө...</div>
+    <div class="services-container">
+        <!-- Карточка №1: Поиск по фото -->
+        <div class="marketing-card" onclick="openWhatsApp('Поиск по фото', 'Здравствуйте! У меня есть фото товара, помогите найти и заказать его')">
+            <div class="marketing-icon">
+                <i class="fas fa-camera"></i>
+            </div>
+            <h3>Вы нам — фото, мы вам — товар!</h3>
+            <p>Понравилась вещь в Instagram или магазине? Просто пришлите нам скриншот! Мы сами найдем этот товар в Китае по самой выгодной цене.</p>
+            <ul class="marketing-list">
+                <li><i class="fas fa-search"></i> Найдем товар в Китае по лучшей цене</li>
+                <li><i class="fas fa-ruler"></i> Поможем с размером для идеальной посадки</li>
+                <li><i class="fas fa-check-circle"></i> Проверим на брак перед отправкой</li>
+                <li><i class="fas fa-truck"></i> Подберем Карго и доставим в любую точку Кыргызстана</li>
+            </ul>
+            <div class="marketing-btn">
+                <i class="fab fa-whatsapp"></i> Заказать поиск (WhatsApp)
+            </div>
+        </div>
+        
+        <!-- Карточка №2: Помощь в регистрации -->
+        <div class="marketing-card" onclick="openWhatsApp('Регистрация аккаунта', 'Здравствуйте! Мне нужна помощь в регистрации аккаунта на китайских сайтах')">
+            <div class="marketing-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h3>Ваш личный доступ к рынкам Китая</h3>
+            <p>Хотите сами выбирать товары на заводах Китая? Мы поможем во всем разобраться:</p>
+            <ul class="marketing-list">
+                <li><i class="fab fa-alipay"></i> Регистрация в Alipay, 1688, Pinduoduo, Poizon</li>
+                <li><i class="fas fa-credit-card"></i> Привязка банковской карты для оплаты</li>
+                <li><i class="fas fa-shield-alt"></i> Безопасная настройка аккаунта</li>
+                <li><i class="fas fa-graduation-cap"></i> Первая консультация и базовые уроки бесплатно</li>
+            </ul>
+            <div class="marketing-btn">
+                <i class="fab fa-whatsapp"></i> Получить консультацию
+            </div>
+        </div>
+        
+        <!-- Динамикалык услугалар (Firebaseтен) -->
+        <div class="dynamic-services">
+            <div class="dynamic-title">
+                <i class="fas fa-cogs"></i> Кошумча услугалар
+            </div>
+            <div id="services-list"></div>
+        </div>
     </div>
 
     <script>
         const firebaseConfig = { databaseURL: "https://yuanexchange-2fe09-default-rtdb.europe-west1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
+        
+        let supportNumber = '996990032007';
+        
+        // WhatsApp ачуу функциясы
+        function openWhatsApp(service, message) {
+            db.ref('exchangeSettings/support/whatsapp').once('value', (snap) => {
+                const whatsappNumber = snap.val() || '996990032007';
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+            });
+        }
+        
         // Dark mode ата-энеден алуу
         function checkParentDarkMode() {
             try {
@@ -101,16 +323,28 @@
             } catch(e) {}
         }
         checkParentDarkMode();
-
+        
+        // Dark mode синхронизациясы (iframe ичинде)
+        window.addEventListener('message', (event) => {
+            if (event.data && typeof event.data.darkMode === 'boolean') {
+                if (event.data.darkMode) {
+                    document.body.classList.add('dark');
+                } else {
+                    document.body.classList.remove('dark');
+                }
+            }
+        });
+        
         // Услугаларды жүктөө
         function loadServices() {
             const container = document.getElementById('services-list');
+            if (!container) return;
             
             db.ref('services').on('value', (snap) => {
                 container.innerHTML = '';
                 
                 if (!snap.exists()) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Услугалар жок</div>';
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Кошумча услугалар жок</div>';
                     return;
                 }
                 
@@ -118,29 +352,27 @@
                 snap.forEach(child => {
                     hasServices = true;
                     const svc = child.val();
-                    const serviceId = child.key;
                     
                     const div = document.createElement('div');
-                    div.className = 'service-card';
+                    div.className = 'service-item';
                     div.onclick = () => {
                         if (svc.link) {
                             window.open(svc.link, '_blank');
                         }
                     };
                     
-                    // Иконканы атына карап тандоо
                     let iconClass = 'fas fa-link';
-                    if (svc.name.toLowerCase().includes('alipay')) iconClass = 'fab fa-alipay';
-                    else if (svc.name.toLowerCase().includes('wechat')) iconClass = 'fab fa-weixin';
-                    else if (svc.name.toLowerCase().includes('telegram')) iconClass = 'fab fa-telegram';
-                    else if (svc.name.toLowerCase().includes('whatsapp')) iconClass = 'fab fa-whatsapp';
-                    else if (svc.name.toLowerCase().includes('курс')) iconClass = 'fas fa-chart-line';
+                    if (svc.name && svc.name.toLowerCase().includes('alipay')) iconClass = 'fab fa-alipay';
+                    else if (svc.name && svc.name.toLowerCase().includes('wechat')) iconClass = 'fab fa-weixin';
+                    else if (svc.name && svc.name.toLowerCase().includes('telegram')) iconClass = 'fab fa-telegram';
+                    else if (svc.name && svc.name.toLowerCase().includes('whatsapp')) iconClass = 'fab fa-whatsapp';
+                    else if (svc.name && svc.name.toLowerCase().includes('курс')) iconClass = 'fas fa-chart-line';
                     
                     div.innerHTML = `
-                        <div class="service-icon"><i class="${iconClass}"></i></div>
-                        <div class="service-info">
-                            <div class="service-name">${escapeHtml(svc.name)}</div>
-                            <div class="service-link">${escapeHtml(svc.link || '')}</div>
+                        <div class="service-item-icon"><i class="${iconClass}"></i></div>
+                        <div class="service-item-info">
+                            <div class="service-item-name">${escapeHtml(svc.name || 'Услуга')}</div>
+                            <div class="service-item-link">${escapeHtml(svc.link || '')}</div>
                         </div>
                         <i class="fas fa-chevron-right" style="color: var(--grey);"></i>
                     `;
@@ -148,21 +380,22 @@
                 });
                 
                 if (!hasServices) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Услугалар жок</div>';
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-cogs"></i><br>Кошумча услугалар жок</div>';
                 }
             });
         }
         
         function escapeHtml(str) {
             if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
         
+        // Ишке киргизүү
         loadServices();
     </script>
 </body>
