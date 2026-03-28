@@ -152,7 +152,6 @@ function updateUI() {
             settings.channelLink = data.channelLink || settings.channelLink;
             settings.support = data.support || settings.support;
             
-            // Акция блогу жашырылды (башкы бетте көрүнбөйт)
             if (promoDisplay) {
                 promoDisplay.style.display = 'none';
             }
@@ -174,7 +173,7 @@ function updateUI() {
     });
 }
 
-// Пикирлерди жүктөө (коопсуз экранирование менен)
+// Пикирлерди жүктөө
 function loadReviews() {
     const container = document.getElementById('reviews-container');
     if (!container) return;
@@ -210,7 +209,6 @@ function loadReviews() {
     });
 }
 
-// Пикир жөнөтүү (санитизация менен)
 function submitReview() {
     const t = translations[currentLang];
     const name = document.getElementById('rev-name')?.value.trim();
@@ -221,7 +219,6 @@ function submitReview() {
         return;
     }
     
-    // Узундукту текшерүү
     if (name.length > 50) {
         alert("Атыңыз 50 символдон ашпоого тийиш!");
         return;
@@ -311,7 +308,6 @@ function showPage(pageId) {
     if (pageHistory.length > 10) pageHistory.shift();
     
     updateBackButton();
-    if (typeof toggleMenu === 'function') toggleMenu(false);
 }
 
 function updateBackButton() {
@@ -333,18 +329,22 @@ function goBack() {
     }
 }
 
+// МЕНЮ ФУНКЦИЯСЫ (туура иштеши үчүн)
 function toggleMenu(forceClose) {
     const menu = document.getElementById('side-menu');
     const overlay = document.getElementById('menu-overlay');
     if (!menu || !overlay) return;
     
-    if (forceClose === false) {
-        menu.classList.remove('active');
-        overlay.classList.remove('active');
-    } else if (forceClose === true) {
-        menu.classList.remove('active');
-        overlay.classList.remove('active');
+    if (forceClose === true || forceClose === false) {
+        if (forceClose === false) {
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+        } else {
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+        }
     } else {
+        // toggle режими
         menu.classList.toggle('active');
         overlay.classList.toggle('active');
     }

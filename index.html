@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yuan Exchange | Моментальный обмен</title>
+    <title>Юаньдын бүгүнкү курсу</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -30,7 +30,7 @@
     <div id="page-home" class="page active">
         <div id="welcome-block" class="welcome-card" onclick="handleWelcomeClick()"></div>
         
-        <!-- АКЦИЯ БЛОГУ (башкы бетте көрүнөт, курстардын үстүндө) -->
+        <!-- АКЦИЯ БЛОГУ -->
         <div id="promo-banner" class="promo-section" style="display: none; cursor: pointer;" onclick="showPromotionsModal()">
             <i class="fas fa-gift"></i> <span id="promo-banner-text">Акцияларды көрүү</span>
         </div>
@@ -59,9 +59,9 @@
                 <span class="currency">KGS</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('som', 500)">500</button>
-                <button onclick="setVal('som', 1000)">1000</button>
-                <button onclick="setVal('som', 5000)">5000</button>
+                <button onclick="setVal('som', 500)">500с</button>
+                <button onclick="setVal('som', 1000)">1000с</button>
+                <button onclick="setVal('som', 5000)">5000с</button>
                 <button onclick="focusInput('som-input')" id="btn-other-s" class="other-btn">Башка</button>
             </div>
         </div>
@@ -73,9 +73,9 @@
                 <span class="currency">CNY</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('yuan', 50)">50</button>
-                <button onclick="setVal('yuan', 100)">100</button>
-                <button onclick="setVal('yuan', 500)">500</button>
+                <button onclick="setVal('yuan', 50)">50ю</button>
+                <button onclick="setVal('yuan', 100)">100ю</button>
+                <button onclick="setVal('yuan', 500)">500ю</button>
                 <button onclick="focusInput('yuan-input')" id="btn-other-y" class="other-btn">Башка</button>
             </div>
         </div>
@@ -217,24 +217,24 @@
     </div>
 </div>
 
-<!-- Сайдбар меню -->
+<!-- Сайдбар меню (жабылуу функциясы туура иштейт) -->
 <div id="side-menu" class="side-menu">
-    <div class="menu-close" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+    <div class="menu-close" onclick="toggleMenu(false)"><i class="fas fa-times"></i></div>
     <div id="menu-user-info"></div>
     <div class="menu-items">
-        <a href="#" onclick="showPage('page-home'); toggleMenu()" class="menu-link" id="m-home">🏠 Башкы бет</a>
-        <a href="#" onclick="showPage('page-guide'); toggleMenu()" class="menu-link" id="m-guide">❓ Нускама</a>
-        <a href="#" onclick="showPage('page-course'); toggleMenu()" class="menu-link" id="m-course">💰 Курстар</a>
-        <a href="#" onclick="loadMyOrders(); showPage('page-my-orders'); toggleMenu()" class="menu-link" id="m-my-orders">📦 Менин заказдарым</a>
-        <a href="#" onclick="showPage('page-support'); toggleMenu()" class="menu-link" id="m-support">🛟 Колдоо</a>
-        <a href="#" onclick="showPage('page-channel'); toggleMenu()" class="menu-link" id="m-channel">📢 Канал</a>
-        <a href="#" onclick="showPage('page-services'); toggleMenu()" class="menu-link" id="m-services">⚙️ Услугалар</a>
-        <a href="#" onclick="showPage('page-reviews'); toggleMenu()" class="menu-link" id="m-reviews">⭐ Пикирлер</a>
+        <a href="#" onclick="navigateToPage('page-home')" class="menu-link" id="m-home">🏠 Башкы бет</a>
+        <a href="#" onclick="navigateToPage('page-guide')" class="menu-link" id="m-guide">❓ Нускама</a>
+        <a href="#" onclick="navigateToPage('page-course')" class="menu-link" id="m-course">💰 Курстар</a>
+        <a href="#" onclick="navigateToMyOrders()" class="menu-link" id="m-my-orders">📦 Менин заказдарым</a>
+        <a href="#" onclick="navigateToPage('page-support')" class="menu-link" id="m-support">🛟 Колдоо</a>
+        <a href="#" onclick="navigateToPage('page-channel')" class="menu-link" id="m-channel">📢 Канал</a>
+        <a href="#" onclick="navigateToPage('page-services')" class="menu-link" id="m-services">⚙️ Услугалар</a>
+        <a href="#" onclick="navigateToPage('page-reviews')" class="menu-link" id="m-reviews">⭐ Пикирлер</a>
         <div class="menu-divider" id="m-div-auth">Аккаунт</div>
-        <a href="#" onclick="logout()" class="menu-link" id="m-logout">🚪 Чыгуу</a>
+        <a href="#" onclick="logoutAndCloseMenu()" class="menu-link" id="m-logout">🚪 Чыгуу</a>
     </div>
 </div>
-<div id="menu-overlay" onclick="toggleMenu()"></div>
+<div id="menu-overlay" onclick="toggleMenu(false)"></div>
 
 <!-- Auth Modal -->
 <div id="auth-modal" class="auth-modal" style="display: none;">
@@ -279,11 +279,28 @@
 <script src="app.js"></script>
 
 <script>
-// ============ ЖАҢЫ ФУНКЦИЯЛАР ============
+// ============ МЕНЮ ЖАБЫЛУУ ФУНКЦИЯЛАРЫ ============
 
-const ADMIN_CODE = "197907";
+// Навигация жана меню жабуу (негизги функция)
+function navigateToPage(pageId) {
+    showPage(pageId);      // Бетти көрсөтүү
+    toggleMenu(false);     // Менюну жабуу
+}
 
-// Акцияларды жүктөө жана башкы бетте көрсөтүү
+// Менин заказдарым үчүн атайын (заказдарды жүктөп, бетти көрсөтүү)
+function navigateToMyOrders() {
+    loadMyOrders();        // Заказдарды жүктөө
+    showPage('page-my-orders');  // Бетти көрсөтүү
+    toggleMenu(false);     // Менюну жабуу
+}
+
+// Чыгуу жана меню жабуу
+function logoutAndCloseMenu() {
+    logout();              // Чыгуу
+    toggleMenu(false);     // Менюну жабуу
+}
+
+// ============ АКЦИЯЛАР ============
 function loadPromotionsForHome() {
     db.ref('promotions').on('value', (snap) => {
         const banner = document.getElementById('promo-banner');
@@ -315,7 +332,6 @@ function loadPromotionsForHome() {
     });
 }
 
-// Акциялар модалдык терезесин ачуу
 function showPromotionsModal() {
     const modal = document.getElementById('promotions-modal');
     const listContainer = document.getElementById('promotions-modal-list');
@@ -373,7 +389,7 @@ function closePromotionsModal() {
     if (modal) modal.style.display = 'none';
 }
 
-// Менин заказдарымды жүктөө (коопсуз)
+// ============ МЕНИН ЗАКАЗДАРЫМ ============
 function loadMyOrders() {
     if (!currentUser) {
         alert(translations[currentLang]?.alert_fill || "Заказдарыңызды көрүү үчүн кириңиз!");
@@ -417,7 +433,20 @@ function loadMyOrders() {
     });
 }
 
-// Админ кирүү
+// ============ КООПСУЗДУК ============
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============ АДМИН КИРҮҮ ============
+const ADMIN_CODE = "197907";
+
 window.originalLogin = login;
 window.login = function() {
     const code = document.getElementById('login-code')?.value.trim();
@@ -451,7 +480,7 @@ if (adminWelcomeBlock) {
     });
 }
 
-// Тил которуу
+// ============ ТИЛ ============
 const originalSwitchLang = switchLang;
 window.switchLang = function(lang) {
     originalSwitchLang(lang);
