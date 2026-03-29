@@ -827,3 +827,87 @@ textarea:focus, input:focus {
         flex-wrap: wrap;
     }
 }
+/* КУРС БӨЛҮМҮ - БИР КАРТОЧКА */
+.rate-card-main {
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.rate-header-main {
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 16px;
+    color: var(--primary);
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.rates-container {
+    display: flex;
+    gap: 16px;
+}
+
+.rate-subsection {
+    flex: 1;
+}
+
+.rate-subheader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.rate-subheader i {
+    font-size: 18px;
+}
+
+.rate-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rate-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    padding: 4px 0;
+}
+
+.rate-row span {
+    color: var(--grey);
+}
+
+.rate-row strong {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+/* Адаптивдүүлүк */
+@media (max-width: 480px) {
+    .rates-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .rate-subsection {
+        width: 100%;
+    }
+    
+    .rate-row {
+        font-size: 11px;
+    }
+    
+    .rate-row strong {
+        font-size: 13px;
+    }
+}

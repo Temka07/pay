@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Юаньдын бүгүнкү курсу</title>
+    <title>Yuan Exchange | Моментальный обмен</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -35,15 +35,38 @@
             <i class="fas fa-gift"></i> <span id="promo-banner-text">Акцияларды көрүү</span>
         </div>
         
-        <div class="glass-card rate-card">
-            <div id="txt-today-rate" class="rate-header">🇨🇳 Юаньдын бүгүнкү курсу:</div>
-            <div class="rate-rows">
-                <div class="rate-row"><span id="txt-r-1">100ю чейин</span> <strong id="p-rate-1">--</strong></div>
-                <div class="rate-row"><span id="txt-r-2">100ю — 3000ю чейин</span> <strong id="p-rate-2">--</strong></div>
-                <div class="rate-row"><span id="txt-r-3">3000ю жогору</span> <strong id="p-rate-3">--</strong></div>
+        <!-- КУРС БӨЛҮМҮ - БИР КАРТОЧКА -->
+        <div class="glass-card rate-card-main">
+            <div class="rate-header-main">
+                <span>🇨🇳 Юаньдын бүгүнкү курсу</span>
+            </div>
+            <div class="rates-container">
+                <!-- Alipay курсу -->
+                <div class="rate-subsection">
+                    <div class="rate-subheader">
+                        <i class="fab fa-alipay"></i> Alipay
+                    </div>
+                    <div class="rate-rows">
+                        <div class="rate-row"><span>ДО (&lt;100ю)</span> <strong id="ali-rate-t1">--</strong></div>
+                        <div class="rate-row"><span>100ю(&lt;3000ю)</span> <strong id="ali-rate-t2">--</strong></div>
+                        <div class="rate-row"><span>Свыше(&gt;3000ю)</span> <strong id="ali-rate-t3">--</strong></div>
+                    </div>
+                </div>
+                <!-- WeChat курсу -->
+                <div class="rate-subsection">
+                    <div class="rate-subheader">
+                        <i class="fab fa-weixin"></i> WeChat
+                    </div>
+                    <div class="rate-rows">
+                        <div class="rate-row"><span>До (&lt;100ю)</span> <strong id="we-rate-t1">--</strong></div>
+                        <div class="rate-row"><span>100ю(&lt;3000ю)</span> <strong id="we-rate-t2">--</strong></div>
+                        <div class="rate-row"><span>Свыше(&gt;3000ю)</span> <strong id="we-rate-t3">--</strong></div>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- НУСКАМА СТЕПТЕРИ (1,2,3) -->
         <div class="steps-container" onclick="showPage('page-guide')">
             <div class="step-item"><span class="step-num">1</span> <span id="step-1" class="step-text">Жазыңыз</span></div>
             <div class="step-line"></div>
@@ -59,9 +82,9 @@
                 <span class="currency">KGS</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('som', 500)">500с</button>
-                <button onclick="setVal('som', 1000)">1000с</button>
-                <button onclick="setVal('som', 5000)">5000с</button>
+                <button onclick="setVal('som', 500)">500</button>
+                <button onclick="setVal('som', 1000)">1000</button>
+                <button onclick="setVal('som', 5000)">5000</button>
                 <button onclick="focusInput('som-input')" id="btn-other-s" class="other-btn">Башка</button>
             </div>
         </div>
@@ -73,9 +96,9 @@
                 <span class="currency">CNY</span>
             </div>
             <div class="quick-btns">
-                <button onclick="setVal('yuan', 50)">50ю</button>
-                <button onclick="setVal('yuan', 100)">100ю</button>
-                <button onclick="setVal('yuan', 500)">500ю</button>
+                <button onclick="setVal('yuan', 50)">50</button>
+                <button onclick="setVal('yuan', 100)">100</button>
+                <button onclick="setVal('yuan', 500)">500</button>
                 <button onclick="focusInput('yuan-input')" id="btn-other-y" class="other-btn">Башка</button>
             </div>
         </div>
@@ -85,7 +108,7 @@
             <button id="we-btn" onclick="setApp('WeChat')"><i class="fab fa-weixin"></i> WeChat</button>
         </div>
 
-        <div class="rate-info"><span id="txt-cur-rate">Курс:</span> <strong id="current-rate">0.00</strong></div>
+        <div class="rate-info"><span id="txt-cur-rate">Учурдагы курс:</span> <strong id="current-rate">0.00</strong></div>
 
         <div class="bank-card-black" onclick="copyNum()">
             <div class="bank-content">
@@ -118,13 +141,13 @@
     <div id="page-course" class="page">
         <h2 id="course-title">Курстар</h2>
         <div class="glass-card">
-            <div id="course-links" class="service-buttons">
-                <a href="https://t.me/alipei_0" target="_blank" class="service-btn">
-                    <i class="fab fa-alipay"></i> Alipay курсу
-                </a>
-                <a href="https://t.me/+U8EZ2msYrqoyMDUy" target="_blank" class="service-btn">
-                    <i class="fas fa-chart-line"></i> Pinduoduo курсу
-                </a>
+            <div class="rate-subsection">
+                <div class="rate-subheader"><i class="fab fa-alipay"></i> Alipay курсу</div>
+                <div class="rate-rows" id="course-ali-rates"></div>
+            </div>
+            <div class="rate-subsection" style="margin-top: 20px;">
+                <div class="rate-subheader"><i class="fab fa-weixin"></i> WeChat курсу</div>
+                <div class="rate-rows" id="course-we-rates"></div>
             </div>
         </div>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
@@ -171,9 +194,9 @@
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')">АРТКА КАЙТУУ</button>
     </div>
 
-    <!-- Услугалар страницасы -->
+    <!-- Услугалар страницасы (iframe) -->
     <div id="page-services" class="page">
-        <iframe src="services.html" style="width: 100%; height: 80vh; border: none; border-radius: 24px; background: transparent;"></iframe>
+        <iframe src="services.html" style="width: 100%; height: 85vh; border: none; border-radius: 28px; background: transparent;"></iframe>
         <button class="main-submit-btn back-btn" onclick="showPage('page-home')" style="margin-top: 15px;">АРТКА КАЙТУУ</button>
     </div>
 
@@ -217,7 +240,7 @@
     </div>
 </div>
 
-<!-- Сайдбар меню (жабылуу функциясы туура иштейт) -->
+<!-- Сайдбар меню -->
 <div id="side-menu" class="side-menu">
     <div class="menu-close" onclick="toggleMenu(false)"><i class="fas fa-times"></i></div>
     <div id="menu-user-info"></div>
@@ -279,25 +302,63 @@
 <script src="app.js"></script>
 
 <script>
-// ============ МЕНЮ ЖАБЫЛУУ ФУНКЦИЯЛАРЫ ============
-
-// Навигация жана меню жабуу (негизги функция)
+// ============ МЕНЮ ЖАБЫЛУУ ============
 function navigateToPage(pageId) {
-    showPage(pageId);      // Бетти көрсөтүү
-    toggleMenu(false);     // Менюну жабуу
+    showPage(pageId);
+    toggleMenu(false);
 }
 
-// Менин заказдарым үчүн атайын (заказдарды жүктөп, бетти көрсөтүү)
 function navigateToMyOrders() {
-    loadMyOrders();        // Заказдарды жүктөө
-    showPage('page-my-orders');  // Бетти көрсөтүү
-    toggleMenu(false);     // Менюну жабуу
+    loadMyOrders();
+    showPage('page-my-orders');
+    toggleMenu(false);
 }
 
-// Чыгуу жана меню жабуу
 function logoutAndCloseMenu() {
-    logout();              // Чыгуу
-    toggleMenu(false);     // Менюну жабуу
+    logout();
+    toggleMenu(false);
+}
+
+// ============ КУРСТАРДЫ ЖАҢЫРТУУ ============
+function updateRatesDisplay() {
+    db.ref('exchangeSettings').on('value', (snap) => {
+        if (snap.exists()) {
+            const data = snap.val();
+            const ali = data.ali || { t1: 0, t2: 0, t3: 0 };
+            const we = data.we || { t1: 0, t2: 0, t3: 0 };
+            
+            const aliT1 = document.getElementById('ali-rate-t1');
+            const aliT2 = document.getElementById('ali-rate-t2');
+            const aliT3 = document.getElementById('ali-rate-t3');
+            const weT1 = document.getElementById('we-rate-t1');
+            const weT2 = document.getElementById('we-rate-t2');
+            const weT3 = document.getElementById('we-rate-t3');
+            
+            if (aliT1) aliT1.innerText = ali.t1?.toFixed(2) || '--';
+            if (aliT2) aliT2.innerText = ali.t2?.toFixed(2) || '--';
+            if (aliT3) aliT3.innerText = ali.t3?.toFixed(2) || '--';
+            if (weT1) weT1.innerText = we.t1?.toFixed(2) || '--';
+            if (weT2) weT2.innerText = we.t2?.toFixed(2) || '--';
+            if (weT3) weT3.innerText = we.t3?.toFixed(2) || '--';
+            
+            const courseAli = document.getElementById('course-ali-rates');
+            const courseWe = document.getElementById('course-we-rates');
+            if (courseAli) {
+                courseAli.innerHTML = `
+                    <div class="rate-row"><span>📊 T1 (&lt;2000с)</span><strong>${ali.t1?.toFixed(2) || '--'}</strong></div>
+                    <div class="rate-row"><span>📈 T2 (&lt;15000с)</span><strong>${ali.t2?.toFixed(2) || '--'}</strong></div>
+                    <div class="rate-row"><span>🚀 T3 (&gt;15000с)</span><strong>${ali.t3?.toFixed(2) || '--'}</strong></div>
+                `;
+            }
+            if (courseWe) {
+                courseWe.innerHTML = `
+                    <div class="rate-row"><span>📊 T1 (&lt;2000с)</span><strong>${we.t1?.toFixed(2) || '--'}</strong></div>
+                    <div class="rate-row"><span>📈 T2 (&lt;15000с)</span><strong>${we.t2?.toFixed(2) || '--'}</strong></div>
+                    <div class="rate-row"><span>🚀 T3 (&gt;15000с)</span><strong>${we.t3?.toFixed(2) || '--'}</strong></div>
+                `;
+            }
+        }
+    });
 }
 
 // ============ АКЦИЯЛАР ============
@@ -521,6 +582,7 @@ if (!translations.ky.my_orders) {
 }
 
 // Ишке киргизүү
+updateRatesDisplay();
 loadPromotionsForHome();
 console.log("%c🔒 Админ коду: 197907", "color: #5856D6; font-size: 14px; font-weight: bold;");
 </script>
