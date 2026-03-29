@@ -2,7 +2,7 @@
 <html lang="ky">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Услугалар | Yuan Exchange</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
@@ -23,6 +23,7 @@
             --grey: #8E8E93;
             --card-bg: white;
             --text: #1C1C1E;
+            --text-secondary: #6C6C70;
             --border: #E5E5EA;
         }
         
@@ -30,271 +31,652 @@
             --bg: #000000;
             --card-bg: #1C1C1E;
             --text: #FFFFFF;
+            --text-secondary: #8E8E93;
             --border: #2C2C2E;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg);
-            padding: 20px;
+            padding: 16px;
             margin: 0;
             color: var(--text);
             transition: all 0.3s;
+            min-height: 100vh;
         }
         
         .services-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
         }
         
-        /* Маркетинг карточкалары */
-        .marketing-card {
-            background: var(--card-bg);
-            border-radius: 28px;
-            padding: 24px;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
+        /* Анимациялар */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .top-services, .special-grid, .promo-block, .other-services {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        
+        .top-services { animation-delay: 0s; }
+        .special-grid { animation-delay: 0.1s; }
+        .promo-block { animation-delay: 0.2s; }
+        .other-services { animation-delay: 0.3s; }
+        
+        /* ============ ҮСТҮҢКҮ ҮЧ КРУГ ============ */
+        .top-services {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .service-circle {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(88, 86, 214, 0.08);
+            padding: 12px 8px;
+            border-radius: 24px;
+        }
+        
+        .service-circle:active {
+            transform: scale(0.96);
+            background: rgba(88, 86, 214, 0.15);
+        }
+        
+        .circle-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), #C692FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 10px rgba(88, 86, 214, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .service-circle:hover .circle-icon {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(88, 86, 214, 0.35);
+        }
+        
+        .circle-icon i {
+            font-size: 26px;
+            color: white;
+        }
+        
+        .service-circle span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* ============ "СПЕЦИАЛЬНО ДЛЯ ВАС" - БААРЫ В РАЗРАБОТКЕ ============ */
+        .special-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        
+        .special-title h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .special-title span {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .special-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        
+        .special-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .special-circle:active {
+            transform: scale(0.96);
+        }
+        
+        .special-icon {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 70px;
+            background: linear-gradient(135deg, rgba(88,86,214,0.15), rgba(198,146,255,0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border: 1.5px solid var(--border);
+        }
+        
+        .special-circle:hover .special-icon {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(88,86,214,0.25), rgba(198,146,255,0.2));
+            border-color: var(--primary);
+        }
+        
+        .special-icon i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .special-circle span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+        }
+        
+        /* ============ РЕКЛАМА БЛОКУ ============ */
+        .promo-block {
+            background: linear-gradient(135deg, var(--primary), #7C6EF2);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
         
-        .marketing-card::before {
+        .promo-block::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), #C692FF);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transition: all 0.5s ease;
         }
         
-        .marketing-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        .promo-block:hover::before {
+            transform: scale(1.2);
         }
         
-        .marketing-card:hover::before {
-            transform: scaleX(1);
+        .promo-block:active {
+            transform: scale(0.98);
         }
         
-        .marketing-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), #C692FF);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .marketing-icon i {
-            font-size: 28px;
-            color: white;
-        }
-        
-        .marketing-card h3 {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            color: var(--text);
-        }
-        
-        .marketing-card p {
-            font-size: 14px;
-            color: var(--grey);
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-        
-        .marketing-list {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-        
-        .marketing-list li {
-            font-size: 13px;
-            padding: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text);
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .marketing-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .marketing-list li i {
-            width: 24px;
-            color: var(--primary);
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .marketing-btn {
-            background: var(--primary);
-            color: white;
-            padding: 14px 24px;
-            border-radius: 40px;
-            text-align: center;
-            font-weight: 800;
-            font-size: 15px;
-            transition: all 0.2s ease;
-            display: inline-block;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .marketing-btn i {
-            margin-right: 8px;
-        }
-        
-        .marketing-card:hover .marketing-btn {
-            background: var(--primary-light);
-            transform: scale(1.02);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--grey);
-        }
-        
-        /* Динамикалык услугалар бөлүмү */
-        .dynamic-services {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .dynamic-title {
+        .promo-block h3 {
             font-size: 18px;
             font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .promo-block p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
             margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        
+        .promo-block .promo-btn {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* ============ БАШКА УСЛУГАЛАР ============ */
+        .other-services {
+            margin-top: 8px;
+        }
+        
+        .other-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
             color: var(--text);
         }
         
-        .service-item {
-            background: var(--bg);
-            border-radius: 16px;
-            padding: 15px;
+        .other-item {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             border: 1px solid var(--border);
         }
         
-        .service-item:hover {
-            transform: translateX(5px);
-            background: var(--card-bg);
+        .other-item:active {
+            transform: scale(0.98);
+            background: var(--bg);
         }
         
-        .service-item-icon {
-            width: 44px;
-            height: 44px;
-            background: var(--primary);
-            border-radius: 14px;
+        .other-item-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), #C692FF);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 22px;
+            flex-shrink: 0;
         }
         
-        .service-item-info {
+        .other-item-info {
             flex: 1;
         }
         
-        .service-item-name {
+        .other-item-name {
             font-weight: 700;
             font-size: 15px;
             margin-bottom: 4px;
         }
         
-        .service-item-link {
+        .other-item-desc {
             font-size: 11px;
-            color: var(--grey);
-            word-break: break-all;
+            color: var(--text-secondary);
         }
         
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        /* ============ ДЕТАЛДУУ БАРАКЧАЛАР (PAGES) ============ */
+        .detail-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 1100;
+            padding: 20px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .detail-page.active {
+            transform: translateX(0);
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .detail-back {
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+        
+        .detail-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+        }
+        
+        .detail-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), #C692FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+        
+        .detail-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .detail-content {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .detail-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .detail-text {
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .detail-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .detail-list li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .detail-list li i {
+            width: 28px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .whatsapp-detail-btn {
+            background: #25D366;
+            color: white;
+            padding: 16px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            width: 100%;
+        }
+        
+        .whatsapp-detail-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* ============ АДАПТИВДҮҮЛҮК ============ */
         @media (max-width: 480px) {
             body {
-                padding: 15px;
+                padding: 12px;
             }
             
-            .marketing-card h3 {
-                font-size: 18px;
+            .circle-icon {
+                width: 50px;
+                height: 50px;
             }
             
-            .marketing-card p {
-                font-size: 13px;
+            .circle-icon i {
+                font-size: 22px;
             }
             
-            .marketing-list li {
-                font-size: 12px;
+            .service-circle span {
+                font-size: 10px;
+            }
+            
+            .special-icon {
+                max-width: 60px;
+            }
+            
+            .special-icon i {
+                font-size: 20px;
+            }
+            
+            .special-circle span {
+                font-size: 10px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .special-grid {
+                gap: 8px;
+            }
+            
+            .special-icon {
+                max-width: 55px;
+            }
+            
+            .service-circle span {
+                font-size: 9px;
             }
         }
     </style>
 </head>
 <body>
     <div class="services-container">
-        <!-- Карточка №1: Поиск по фото -->
-        <div class="marketing-card" onclick="openWhatsApp('Поиск по фото', 'Здравствуйте! У меня есть фото товара, помогите найти и заказать его')">
-            <div class="marketing-icon">
-                <i class="fas fa-camera"></i>
+        <!-- ҮСТҮҢКҮ ҮЧ КРУГ -->
+        <div class="top-services">
+            <div class="service-circle" onclick="openDetailPage('buyout')">
+                <div class="circle-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <span>Выкуп товара<br>под ключ</span>
             </div>
-            <h3>Вы нам — фото, мы вам — товар!</h3>
-            <p>Понравилась вещь в Instagram или магазине? Просто пришлите нам скриншот! Мы сами найдем этот товар в Китае по самой выгодной цене.</p>
-            <ul class="marketing-list">
-                <li><i class="fas fa-search"></i> Найдем товар в Китае по лучшей цене</li>
-                <li><i class="fas fa-ruler"></i> Поможем с размером для идеальной посадки</li>
-                <li><i class="fas fa-check-circle"></i> Проверим на брак перед отправкой</li>
-                <li><i class="fas fa-truck"></i> Подберем Карго и доставим в любую точку Кыргызстана</li>
-            </ul>
-            <div class="marketing-btn">
-                <i class="fab fa-whatsapp"></i> Заказать поиск (WhatsApp)
+            
+            <div class="service-circle" onclick="openDetailPage('registration')">
+                <div class="circle-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <span>Помощь в<br>регистрации</span>
             </div>
-        </div>
-        
-        <!-- Карточка №2: Помощь в регистрации -->
-        <div class="marketing-card" onclick="openWhatsApp('Регистрация аккаунта', 'Здравствуйте! Мне нужна помощь в регистрации аккаунта на китайских сайтах')">
-            <div class="marketing-icon">
-                <i class="fas fa-user-plus"></i>
-            </div>
-            <h3>Ваш личный доступ к рынкам Китая</h3>
-            <p>Хотите сами выбирать товары на заводах Китая? Мы поможем во всем разобраться:</p>
-            <ul class="marketing-list">
-                <li><i class="fab fa-alipay"></i> Регистрация в Alipay, 1688, Pinduoduo, Poizon</li>
-                <li><i class="fas fa-credit-card"></i> Привязка банковской карты для оплаты</li>
-                <li><i class="fas fa-shield-alt"></i> Безопасная настройка аккаунта</li>
-                <li><i class="fas fa-graduation-cap"></i> Первая консультация и базовые уроки бесплатно</li>
-            </ul>
-            <div class="marketing-btn">
-                <i class="fab fa-whatsapp"></i> Получить консультацию
+            
+            <div class="service-circle" onclick="showComingSoon()">
+                <div class="circle-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <span>В разработке👨🏻‍💻⚒️</span>
             </div>
         </div>
         
-        <!-- Динамикалык услугалар (Firebaseтен) -->
-        <div class="dynamic-services">
-            <div class="dynamic-title">
-                <i class="fas fa-cogs"></i> Кошумча услугалар
+        <!-- "СПЕЦИАЛЬНО ДЛЯ ВАС" - БААРЫ В РАЗРАБОТКЕ -->
+        <div class="special-title">
+            <h3><i class="fas fa-gem" style="color: var(--primary); margin-right: 6px;"></i> Специально для вас</h3>
+            <span>🚧 В разработке вес услуги В разработке👨🏻‍💻⚒️</span>
+        </div>
+        
+        <div class="special-grid">
+            <div class="special-circle" onclick="showComingSoon()">
+                <div class="special-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <span>Все услуги   В разработке👨🏻‍💻⚒️</span>
+            </div>
+            
+            <div class="special-circle" onclick="showComingSoon()">
+                <div class="special-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <span>Консультация   В разработке👨🏻‍💻⚒️</span>
+            </div>
+            
+            <div class="special-circle" onclick="showComingSoon()">
+                <div class="special-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <span>Сотрудничество  В разработке👨🏻‍💻⚒️</span>
+            </div>
+            
+            <div class="special-circle" onclick="showComingSoon()">
+                <div class="special-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                <span>Задать вопрос  В разработке👨🏻‍💻⚒️</span>
+            </div>
+        </div>
+        
+        <!-- РЕКЛАМА БЛОКУ -->
+        <div class="promo-block" onclick="openPromoOptions()">
+            <h3>🤝 Твой помощник по работе с Китаем!</h3>
+            <p>Покупайте на 1688 и Pinduoduo выгодно. Научим заказывать сами или выкупим и привезем товар за вас.</p>
+            <div class="promo-btn">Узнать подробнее →</div>
+        </div>
+        
+        <!-- БАШКА УСЛУГАЛАР -->
+        <div class="other-services">
+            <div class="other-title">
+                <i class="fas fa-ellipsis-h"></i> Другие услуги
             </div>
             <div id="services-list"></div>
+        </div>
+    </div>
+    
+    <!-- ============ ДЕТАЛДУУ БАРАКЧАЛАР ============ -->
+    
+    <!-- Баракча: Выкуп товара под ключ -->
+    <div id="page-buyout" class="detail-page">
+        <div class="detail-header">
+            <div class="detail-back" onclick="closeDetailPage('page-buyout')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h2>Выкуп товара под ключ</h2>
+        </div>
+        <div class="detail-icon">
+            <i class="fas fa-shopping-bag"></i>
+        </div>
+        <div class="detail-content">
+            <div class="detail-title">Закажем за вас</div>
+            <div class="detail-text">
+                Вы просто скидываете нам фото ии ссылку на товар — мы общаемся с продавцом, выкупаем, проверяем качество и привозим в Кыргызстан.
+            </div>
+            <ul class="detail-list">
+                <li><i class="fas fa-users"></i> Для тех, кто ценит время и хочет получить готовый результат без лишних хлопот.</li>
+                <li><i class="fas fa-shield-alt"></i> Безопасная сделка и доставка до вашего города.</li>
+                <li><i class="fas fa-check-circle"></i> Полное сопровождение от заказа до получения.</li>
+            </ul>
+            <button class="whatsapp-detail-btn" onclick="openWhatsAppFromPage('Выкуп товара под ключ', 'Здравствуйте! Хочу заказать выкуп товара под ключ')">
+                <i class="fab fa-whatsapp"></i> Связаться через WhatsApp
+            </button>
+        </div>
+    </div>
+    
+    <!-- Баракча: Помощь в регистрации -->
+    <div id="page-registration" class="detail-page">
+        <div class="detail-header">
+            <div class="detail-back" onclick="closeDetailPage('page-registration')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h2>Помощь в регистрации</h2>
+        </div>
+        <div class="detail-icon">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="detail-content">
+            <div class="detail-title">Научим вас</div>
+            <div class="detail-text">
+                Мы пошагово покажем, как скачивать приложения, регистрироваться и находить товары по самым низким ценам.
+            </div>
+            <ul class="detail-list">
+                <li><i class="fas fa-graduation-cap"></i> Для тех, кто хочет экономить максимум и не зависеть от посредников.</li>
+                <li><i class="fas fa-chart-line"></i> Вы станете профи и сможете заказывать сами в любое время.</li>
+                <li><i class="fab fa-alipay"></i> Регистрация в Alipay, 1688, Pinduoduo, Poizon, Taobao.</li>
+            </ul>
+            <button class="whatsapp-detail-btn" onclick="openWhatsAppFromPage('Помощь в регистрации', 'Здравствуйте! Хочу научиться заказывать товары из Китая')">
+                <i class="fab fa-whatsapp"></i> Связаться через WhatsApp
+            </button>
+        </div>
+    </div>
+    
+    <!-- Баракча: Промо варианттары (Үйрөтүү же Заказ кылуу) -->
+    <div id="page-promo" class="detail-page">
+        <div class="detail-header">
+            <div class="detail-back" onclick="closeDetailPage('page-promo')">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <h2>Твой помощник</h2>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Вариант №1 -->
+            <div class="detail-content" style="cursor: pointer;" onclick="openDetailPageFromPromo('registration')">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), #C692FF); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-graduation-cap" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <div style="font-weight: 800; font-size: 18px;">Вариант №1: Научим вас</div>
+                </div>
+                <div class="detail-text" style="margin-bottom: 12px;">
+                    <strong>О чем это:</strong> Мы пошагово покажем, как скачивать приложения, регистрироваться и находить товары по самым низким ценам.
+                </div>
+                <div class="detail-text" style="margin-bottom: 12px;">
+                    <strong>Для кого:</strong> Для тех, кто хочет экономить максимум и не зависеть от посредников.
+                </div>
+                <div class="detail-text">
+                    <strong>Итог:</strong> Вы станете профи и сможете заказывать сами в любое время.
+                </div>
+            </div>
+            
+            <!-- Вариант №2 -->
+            <div class="detail-content" style="cursor: pointer;" onclick="openDetailPageFromPromo('buyout')">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), #C692FF); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-truck" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <div style="font-weight: 800; font-size: 18px;">Вариант №2: Закажем за вас</div>
+                </div>
+                <div class="detail-text" style="margin-bottom: 12px;">
+                    <strong>О чем это:</strong> Вы просто скидываете нам ссылку на товар — мы общаемся с продавцом, выкупаем, проверяем качество и привозим в Кыргызстан.
+                </div>
+                <div class="detail-text" style="margin-bottom: 12px;">
+                    <strong>Для кого:</strong> Для тех, кто ценит время и хочет получить готовый результат без лишних хлопот.
+                </div>
+                <div class="detail-text">
+                    <strong>Итог:</strong> Безопасная сделка и доставка до вашего города.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -303,18 +685,71 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        let supportNumber = '996990032007';
-        
-        // WhatsApp ачуу функциясы
+        // WhatsApp функциялары
         function openWhatsApp(service, message) {
             db.ref('exchangeSettings/support/whatsapp').once('value', (snap) => {
-                const whatsappNumber = snap.val() || '996990032007';
+                const number = snap.val() || '996990032007';
                 const encodedMessage = encodeURIComponent(message);
-                window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+                window.open(`https://wa.me/${number}?text=${encodedMessage}`, '_blank');
             });
         }
         
-        // Dark mode ата-энеден алуу
+        function openWhatsAppFromPage(service, message) {
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/996990032007?text=${encodedMessage}`, '_blank');
+        }
+        
+        // Деталдуу баракчаларды ачуу/жабуу
+        function openDetailPage(pageType) {
+            const pageId = `page-${pageType}`;
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeDetailPage(pageId) {
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // "В разработке" басканда (үстүнкү 3-кнопка жана специально для вас)
+        function showComingSoon() {
+            alert("Услуга временно не работает. скоро будет доступна ! Спасибо на понимание.");
+        }
+        
+        // Промо блокту басканда (эки вариантты көрсөтүү)
+        function openPromoOptions() {
+            const promoPage = document.getElementById('page-promo');
+            if (promoPage) {
+                promoPage.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function openDetailPageFromPromo(type) {
+            // Азыркы промо баракты жаап, тиешелүү деталдуу баракты ачуу
+            closeDetailPage('page-promo');
+            setTimeout(() => {
+                openDetailPage(type);
+            }, 150);
+        }
+        
+        // Escape басканда барактарды жабуу
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.detail-page.active').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Dark mode мурастоо
         function checkParentDarkMode() {
             try {
                 if (window.parent.document.body.classList.contains('dark')) {
@@ -324,7 +759,6 @@
         }
         checkParentDarkMode();
         
-        // Dark mode синхронизациясы (iframe ичинде)
         window.addEventListener('message', (event) => {
             if (event.data && typeof event.data.darkMode === 'boolean') {
                 if (event.data.darkMode) {
@@ -335,7 +769,7 @@
             }
         });
         
-        // Услугаларды жүктөө
+        // Башка услугаларды жүктөө
         function loadServices() {
             const container = document.getElementById('services-list');
             if (!container) return;
@@ -354,10 +788,12 @@
                     const svc = child.val();
                     
                     const div = document.createElement('div');
-                    div.className = 'service-item';
+                    div.className = 'other-item';
                     div.onclick = () => {
                         if (svc.link) {
                             window.open(svc.link, '_blank');
+                        } else {
+                            openWhatsApp(svc.name, `Здравствуйте! Интересуюсь услугой: ${svc.name}`);
                         }
                     };
                     
@@ -367,14 +803,16 @@
                     else if (svc.name && svc.name.toLowerCase().includes('telegram')) iconClass = 'fab fa-telegram';
                     else if (svc.name && svc.name.toLowerCase().includes('whatsapp')) iconClass = 'fab fa-whatsapp';
                     else if (svc.name && svc.name.toLowerCase().includes('курс')) iconClass = 'fas fa-chart-line';
+                    else if (svc.name && svc.name.toLowerCase().includes('доставк')) iconClass = 'fas fa-truck';
+                    else if (svc.name && svc.name.toLowerCase().includes('регистр')) iconClass = 'fas fa-user-plus';
                     
                     div.innerHTML = `
-                        <div class="service-item-icon"><i class="${iconClass}"></i></div>
-                        <div class="service-item-info">
-                            <div class="service-item-name">${escapeHtml(svc.name || 'Услуга')}</div>
-                            <div class="service-item-link">${escapeHtml(svc.link || '')}</div>
+                        <div class="other-item-icon"><i class="${iconClass}"></i></div>
+                        <div class="other-item-info">
+                            <div class="other-item-name">${escapeHtml(svc.name || 'Услуга')}</div>
+                            <div class="other-item-desc">${escapeHtml(svc.link ? 'Перейти →' : 'Нажмите для связи')}</div>
                         </div>
-                        <i class="fas fa-chevron-right" style="color: var(--grey);"></i>
+                        <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
                     `;
                     container.appendChild(div);
                 });
@@ -395,8 +833,8 @@
                 .replace(/'/g, '&#39;');
         }
         
-        // Ишке киргизүү
         loadServices();
+        console.log('%c✨ Услуга временно не работает', 'color: #5856D6; font-size: 12px;');
     </script>
 </body>
 </html>
